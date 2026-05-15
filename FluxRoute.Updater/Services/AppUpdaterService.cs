@@ -215,6 +215,10 @@ public sealed class AppUpdaterService : IAppUpdaterService
                     pause
                     exit /b 1
                 )
+                echo [FluxRoute Updater] Завершаем дочерние процессы...
+                taskkill /IM winws.exe /F > nul 2>&1
+                taskkill /IM WinDivert.exe /F > nul 2>&1
+                net stop WinDivert > nul 2>&1
                 echo [FluxRoute Updater] Очищаем временные файлы...
                 del /F /Q "{tempZip}" > nul 2>&1
                 rd /S /Q "{tempDir}" > nul 2>&1
