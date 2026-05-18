@@ -274,11 +274,13 @@ public partial class MainWindow : Window
 
     private void AnimateNavIndicator(int tabIndex)
     {
-        // Tab 7 (About) is pinned to the bottom — slide pill below main nav zone
+        // Tab 7 (About) is pinned to the bottom in a separate StackPanel (Margin.Top=416)
+        // Center Y = 416 (StackPanel) + 9 (separator) + 4 (Grid margin) + 18 (icon center) = 447
+        // Pill Margin.Top=20, Height=20 → Y = 447 - 10 - 20 = 417
         double targetY;
         if (tabIndex == 7)
         {
-            targetY = 9 * 44;
+            targetY = 417;
         }
         else
         {
