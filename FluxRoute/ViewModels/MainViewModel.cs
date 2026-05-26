@@ -165,6 +165,10 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool siteTelegram = true;
     partial void OnSiteTelegramChanged(bool value) => SaveSettings();
 
+    // ── Свои сайты ──
+    [ObservableProperty] private string userCustomSitesText = "";
+    partial void OnUserCustomSitesTextChanged(string value) => SaveSettings();
+
     private readonly OrchestratorService _orchestrator;
     private readonly AiOrchestratorService _aiOrchestrator;
     private readonly AiStrategyRegistry _aiRegistry;
@@ -395,6 +399,7 @@ public partial class MainViewModel : ObservableObject
         SiteTwitch = settings.SiteTwitch;
         SiteInstagram = settings.SiteInstagram;
         SiteTelegram = settings.SiteTelegram;
+        UserCustomSitesText = string.Join("\n", settings.UserSites ?? new());
         AutoUpdateEnabled = settings.AutoUpdateEnabled;
         AutoStartEnabled = settings.AutoStartEnabled;
         MinimizeToTray = settings.MinimizeToTray;
@@ -436,6 +441,10 @@ public partial class MainViewModel : ObservableObject
             SiteTwitch = SiteTwitch,
             SiteInstagram = SiteInstagram,
             SiteTelegram = SiteTelegram,
+            UserSites = UserCustomSitesText
+                .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .ToList(),
             AutoUpdateEnabled = AutoUpdateEnabled,
             AutoStartEnabled = AutoStartEnabled,
             MinimizeToTray = MinimizeToTray,

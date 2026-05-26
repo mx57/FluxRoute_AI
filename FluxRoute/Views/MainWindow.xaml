@@ -1967,6 +1967,22 @@
                                         <CheckBox Content="Telegram"  IsChecked="{Binding SiteTelegram}"  Margin="0,4,16,4" d:IsLocked="True"/>
                                     </WrapPanel>
 
+                                    <Rectangle Style="{StaticResource Sep}" d:IsLocked="True"/>
+                                    <TextBlock Style="{StaticResource SecH}" Text="СВОИ САЙТЫ" d:IsLocked="True"/>
+                                    <TextBlock FontFamily="Segoe UI" FontSize="11" Foreground="#8B949E" TextWrapping="Wrap"
+                                               Margin="0,0,0,6" d:IsLocked="True"
+                                               Text="Добавьте свои сайты для проверки доступности — по одному на строку. Поддерживаются URL (https://...) и домены (example.com)."/>
+                                    <TextBox Text="{Binding UserCustomSitesText, UpdateSourceTrigger=PropertyChanged}"
+                                             AcceptsReturn="True" TextWrapping="Wrap"
+                                             MinHeight="80" MaxHeight="180"
+                                             VerticalScrollBarVisibility="Auto"
+                                             FontFamily="Consolas" FontSize="12"
+                                             Margin="0,0,0,8" Padding="6,4"
+                                             Background="#0D1117" Foreground="#C9D1D9" CaretBrush="#C9D1D9"
+                                             BorderBrush="#30363D" BorderThickness="1"
+                                             ToolTip="Один сайт на строку. Например:&#10;example.com&#10;https://mysite.ru"
+                                             d:IsLocked="True"/>
+
                                     <Border Margin="0,0,0,8" d:IsLocked="True">
                                         <Border.Style>
                                             <Style TargetType="Border">

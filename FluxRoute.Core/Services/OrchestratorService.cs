@@ -16,6 +16,7 @@ public sealed class OrchestratorService : IDisposable
     public double FailThreshold { get; set; } = 0.5;
     public int RequiredFailuresBeforeSwitch { get; set; } = 2;
     public HashSet<string> EnabledSites { get; set; } = ["YouTube", "Discord", "Google", "Twitch", "Instagram", "Telegram"];
+    public List<TargetEntry> UserSiteTargets { get; set; } = [];
 
     public bool IsRunning => _cts is not null;
     public bool IsScanning { get; private set; }
@@ -316,6 +317,8 @@ public sealed class OrchestratorService : IDisposable
             if (ConnectivityChecker.BuiltinSites.TryGetValue(site, out var entries))
                 targets.AddRange(entries);
         }
+
+        targets.AddRange(UserSiteTargets);
 
         return targets
             .Where(x => !string.IsNullOrWhiteSpace(x.Value))

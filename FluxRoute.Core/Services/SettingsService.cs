@@ -21,6 +21,9 @@ public sealed class AppSettings
     public bool SiteInstagram { get; set; } = true;
     public bool SiteTelegram { get; set; } = true;
 
+    // Пользовательские сайты для проверки
+    public List<string> UserSites { get; set; } = new();
+
     // Рейтинг профилей
     public List<ProfileRatingEntry> ProfileRatings { get; set; } = new();
 

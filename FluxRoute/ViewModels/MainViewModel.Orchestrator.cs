@@ -378,6 +378,25 @@ public partial class MainViewModel
         if (SiteTelegram) sites.Add("Telegram");
         _orchestrator.EnabledSites = sites;
         _aiOrchestrator.EnabledSites = sites;
+
+        var userTargets = UserCustomSitesText
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(s => !string.IsNullOrWhiteSpace(s))
+            .Select(s => BuildUserTargetEntry(s))
+            .ToList();
+        _orchestrator.UserSiteTargets = userTargets;
+        _aiOrchestrator.UserSiteTargets = userTargets;
+    }
+
+    private static TargetEntry BuildUserTargetEntry(string raw)
+    {
+        var url = raw.Contains("://") ? raw : $"https://{raw}";
+        return new TargetEntry
+        {
+            Key = raw,
+            Kind = TargetKind.Http,
+            Value = url
+        };
     }
 
     [RelayCommand]

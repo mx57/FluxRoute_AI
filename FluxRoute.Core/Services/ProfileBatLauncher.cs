@@ -44,6 +44,10 @@ public static class ProfileBatLauncher
 
             var commands = MergeCaretContinuations(File.ReadAllLines(profileBatPath, Encoding.UTF8)).ToList();
 
+            // Сохраняем последнюю диагностическую ошибку — возвращаем её только если
+            // ни одна из строк BAT не привела к успешному запуску.
+            var lastCandidateError = string.Empty;
+
             foreach (var command in commands)
             {
                 if (TryParseSetCommand(command, out var name, out var value))
@@ -69,8 +73,9 @@ public static class ProfileBatLauncher
                 executablePath = Path.GetFullPath(executablePath);
                 if (!File.Exists(executablePath))
                 {
-                    error = $"winws.exe не найден: {executablePath}";
-                    return false;
+                    // Файл не найден по этому пути — продолжаем искать в других строках BAT.
+                    lastCandidateError = $"winws.exe не найден: {executablePath}";
+                    continue;
                 }
 
                 var args = tokens
@@ -81,8 +86,8 @@ public static class ProfileBatLauncher
 
                 if (args.Count == 0)
                 {
-                    error = "В BAT найден winws.exe, но не найдены аргументы запуска.";
-                    return false;
+                    lastCandidateError = "В BAT найден winws.exe, но не найдены аргументы запуска.";
+                    continue;
                 }
 
                 var workingDirectory = Path.GetDirectoryName(executablePath) ?? engineDir;
@@ -90,7 +95,9 @@ public static class ProfileBatLauncher
                 return true;
             }
 
-            error = "В BAT не найдена команда запуска winws.exe.";
+            error = lastCandidateError.Length > 0
+                ? lastCandidateError
+                : "В BAT не найдена команда запуска winws.exe.";
             return false;
         }
         catch (Exception ex)
