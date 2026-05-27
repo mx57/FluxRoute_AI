@@ -14,6 +14,7 @@ public sealed class AppSettings
 
     // Оркестратор
     public string OrchestratorInterval { get; set; } = "1";
+    public bool OrchestratorEnabled { get; set; } = false;
     public bool SiteYouTube { get; set; } = true;
     public bool SiteDiscord { get; set; } = true;
     public bool SiteGoogle { get; set; } = true;

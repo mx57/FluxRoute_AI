@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Data;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluxRoute.Core.Models;
@@ -23,14 +24,29 @@ namespace FluxRoute.ViewModels;
 /// </summary>
 public sealed partial class LogsViewModel : ObservableObject
 {
-    private const int MaxUnifiedLogEntries = 5000;
+    private const int MaxUnifiedLogEntries = 1500;
     private readonly IReadOnlyList<LogSource> _sources;
     private bool _initialized;
     private ICollectionView? _filteredLogEntries;
+    private bool _pendingTextRefresh;
+    private readonly DispatcherTimer _textRefreshTimer;
 
     public LogsViewModel(IReadOnlyList<LogSource> sources)
     {
         _sources = sources ?? throw new ArgumentNullException(nameof(sources));
+        _textRefreshTimer = new DispatcherTimer(DispatcherPriority.Background)
+        {
+            Interval = TimeSpan.FromMilliseconds(250)
+        };
+        _textRefreshTimer.Tick += (_, _) =>
+        {
+            _textRefreshTimer.Stop();
+            if (_pendingTextRefresh)
+            {
+                _pendingTextRefresh = false;
+                DoRefreshUnifiedLogsText();
+            }
+        };
     }
 
     public ObservableCollection<AppLogEntry> UnifiedLogEntries { get; } = new();
@@ -154,7 +170,8 @@ public sealed partial class LogsViewModel : ObservableObject
     {
         EnsureInitialized();
         _filteredLogEntries?.Refresh();
-        RefreshUnifiedLogsText();
+        // При явном переключении фильтра — обновляем текст сразу
+        DoRefreshUnifiedLogsText();
     }
 
     private void AttachLogCollection(ObservableCollection<string> source, AppLogCategory category)
@@ -292,6 +309,17 @@ public sealed partial class LogsViewModel : ObservableObject
     }
 
     private void RefreshUnifiedLogsText()
+    {
+        if (!_initialized || _filteredLogEntries is null)
+            return;
+
+        // Вместо немедленного обновления при каждой записи — ставим флаг и ждём 250 мс.
+        _pendingTextRefresh = true;
+        if (!_textRefreshTimer.IsEnabled)
+            _textRefreshTimer.Start();
+    }
+
+    private void DoRefreshUnifiedLogsText()
     {
         if (!_initialized || _filteredLogEntries is null)
             return;

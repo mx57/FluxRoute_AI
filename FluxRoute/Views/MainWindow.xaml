@@ -1669,8 +1669,7 @@
                                                 <TextBlock Grid.Column="1" Text="Оркестратор" FontFamily="Segoe UI"
                                                        FontSize="11.5" Foreground="#8090B8" VerticalAlignment="Center" Margin="8,0,0,0" d:IsLocked="True"/>
                                                 <CheckBox Grid.Column="2" Style="{StaticResource ToggleSwitch}"
-                                                      IsChecked="{Binding OrchestratorRunning, Mode=OneWay}"
-                                                      Command="{Binding ToggleOrchestratorCommand}" d:IsLocked="True"/>
+                                                      IsChecked="{Binding OrchestratorEnabled, Mode=TwoWay}" d:IsLocked="True"/>
                                             </Grid>
                                             <!-- TG WS Proxy -->
                                             <Grid Margin="0,0,0,11" d:IsLocked="True">
@@ -2532,12 +2531,10 @@
                                                          d:IsLocked="True"/>
                                                 <!-- Кнопка выбора из запущенных процессов -->
                                                 <Grid Grid.Column="2" Margin="6,0,0,0" d:IsLocked="True">
-                                                    <Button Height="28" Padding="8,0"
-                                                            Background="#161B22" Foreground="#C9D1D9"
-                                                            BorderBrush="#30363D" BorderThickness="1"
+                                                    <Button Height="28" Padding="10,0"
+                                                            Style="{StaticResource ActionBtn}"
                                                             ToolTip="Выбрать из запущенных процессов"
                                                             Command="{Binding OpenProcessPickerCommand}"
-                                                            FontFamily="Segoe UI" FontSize="12"
                                                             Content="📋 Выбрать"
                                                             d:IsLocked="True"/>
                                                     <Popup IsOpen="{Binding ProcessPickerOpen, Mode=TwoWay}"

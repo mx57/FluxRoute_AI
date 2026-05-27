@@ -445,6 +445,13 @@ public partial class MainViewModel
         }
     }
 
+    private void TryStartOrchestratorIfEnabled()
+    {
+        if (!OrchestratorEnabled) return;
+        if (_orchestrator.IsRunning || _aiOrchestrator.IsRunning) return;
+        ToggleOrchestrator();
+    }
+
     [RelayCommand]
     private void ToggleOrchestrator()
     {

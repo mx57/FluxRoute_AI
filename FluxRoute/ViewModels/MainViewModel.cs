@@ -238,6 +238,8 @@ public partial class MainViewModel : ObservableObject
 
     // ── Оркестратор ──
     [ObservableProperty] private bool orchestratorRunning;
+    [ObservableProperty] private bool orchestratorEnabled;
+    partial void OnOrchestratorEnabledChanged(bool value) => SaveSettings();
     [ObservableProperty] private string orchestratorStatus = "Не запущен";
     [ObservableProperty] private string orchestratorNextCheck = "—";
     [ObservableProperty] private string orchestratorInterval = "1";
@@ -503,6 +505,7 @@ public partial class MainViewModel : ObservableObject
     private void ApplySettings(AppSettings settings)
     {
         OrchestratorInterval = settings.OrchestratorInterval;
+        OrchestratorEnabled = settings.OrchestratorEnabled;
         SiteYouTube = settings.SiteYouTube;
         SiteDiscord = settings.SiteDiscord;
         SiteGoogle = settings.SiteGoogle;
@@ -549,6 +552,7 @@ public partial class MainViewModel : ObservableObject
         {
             LastProfileFileName = SelectedProfile?.FileName,
             OrchestratorInterval = OrchestratorInterval,
+            OrchestratorEnabled = OrchestratorEnabled,
             SiteYouTube = SiteYouTube,
             SiteDiscord = SiteDiscord,
             SiteGoogle = SiteGoogle,

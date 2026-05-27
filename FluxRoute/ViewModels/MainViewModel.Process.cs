@@ -150,6 +150,7 @@ public partial class MainViewModel
 
         RefreshDiagnostics();
         UpdateRuntimeInfo();
+        TryStartOrchestratorIfEnabled();
     }
 
     private void StartViaBatFallback()
@@ -186,6 +187,7 @@ public partial class MainViewModel
 
         RefreshDiagnostics();
         UpdateRuntimeInfo();
+        TryStartOrchestratorIfEnabled();
     }
 
     private async Task TrackDirectWinwsAsync(Process winws)
@@ -419,12 +421,13 @@ public partial class MainViewModel
         IsRunning = false;
         _runStartedAt = null;
 
-        // Баг 2: если оркестратор запущен, останавливаем его при ручной остановке Zapret.
+        // Останавливаем оркестратор вместе с Zapret (если он запущен).
         if (!_suppressOrchestratorStop && (_orchestrator.IsRunning || _aiOrchestrator.IsRunning))
         {
             _orchestrator.Stop();
             _aiOrchestrator.Stop();
             OrchestratorRunning = false;
+            StopProcessMonitor();
             Logs.Add("[Оркестратор] Остановлен вместе с Zapret.");
         }
 
