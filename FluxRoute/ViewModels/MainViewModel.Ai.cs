@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluxRoute.AI.Models;
 using FluxRoute.Core.Models;
+using FluxRoute.Core.Services;
 using Application = System.Windows.Application;
 
 namespace FluxRoute.ViewModels;
@@ -33,12 +34,14 @@ public partial class MainViewModel
         SaveSettings();
         var runMode = value switch
         {
-            (int)DpiEngineMode.ByeDpi => DpiRunMode.Standalone,
-            (int)DpiEngineMode.Warp => DpiRunMode.Warp,
-            (int)DpiEngineMode.Hybrid => DpiRunMode.Hybrid,
-            (int)DpiEngineMode.WarpZapret => DpiRunMode.WarpZapret,
-            (int)DpiEngineMode.WarpByeDpi => DpiRunMode.WarpByeDpi,
-            _ => DpiRunMode.Standalone
+            (int)DpiEngineMode.ByeDpi => FluxRoute.Core.Services.DpiRunMode.Standalone,
+            (int)DpiEngineMode.Warp => FluxRoute.Core.Services.DpiRunMode.Warp,
+            (int)DpiEngineMode.Hybrid => FluxRoute.Core.Services.DpiRunMode.Hybrid,
+            (int)DpiEngineMode.WarpZapret => FluxRoute.Core.Services.DpiRunMode.WarpZapret,
+            (int)DpiEngineMode.WarpByeDpi => FluxRoute.Core.Services.DpiRunMode.WarpByeDpi,
+            (int)DpiEngineMode.SingBox => FluxRoute.Core.Services.DpiRunMode.SingBox,
+            (int)DpiEngineMode.SingBoxZapret => FluxRoute.Core.Services.DpiRunMode.SingBoxZapret,
+            _ => FluxRoute.Core.Services.DpiRunMode.Standalone
         };
         _engineManager.SetRunMode(runMode);
     }

@@ -12,6 +12,8 @@ public sealed class DpiRunMode
     public const string WarpByeDpi = "warp_byedpi";
     public const string WarpZapretChained = "warp_zapret_chained";
     public const string WarpByeDpiChained = "warp_byedpi_chained";
+    public const string SingBox = "singbox";
+    public const string SingBoxZapret = "singbox_zapret";
     public const string Bypass = "bypass";
 }
 
@@ -43,6 +45,7 @@ public sealed class DpiEngineManager : IDisposable
                 DpiEngineType.Zapret => new ZapretEngine(_engineDir),
                 DpiEngineType.ByeDpi => new ByeDpiEngine(_engineDir),
                 DpiEngineType.Warp => new WarpEngine(_engineDir),
+                DpiEngineType.SingBox => new SingBoxEngine(_engineDir),
                 _ => throw new ArgumentOutOfRangeException(nameof(key), $"Unsupported engine: {key}")
             };
             engine.StatusChanged += (_, status) =>
@@ -60,6 +63,7 @@ public sealed class DpiEngineManager : IDisposable
                 DpiRunMode.Standalone or DpiRunMode.Hybrid or DpiRunMode.Warp or
                 DpiRunMode.WarpZapret or DpiRunMode.WarpByeDpi or
                 DpiRunMode.WarpZapretChained or DpiRunMode.WarpByeDpiChained or
+                DpiRunMode.SingBox or DpiRunMode.SingBoxZapret or
                 DpiRunMode.Bypass => mode,
                 _ => DpiRunMode.Standalone,
             };
@@ -151,6 +155,20 @@ public sealed class DpiEngineManager : IDisposable
                     ct).ConfigureAwait(false);
                 return wc2 && bc2;
 
+            case DpiRunMode.SingBox:
+                await StopAllAsync(ct).ConfigureAwait(false);
+                return await StartAsync(DpiEngineType.SingBox,
+                    profile.EngineType == DpiEngineType.SingBox ? profile : CloneWithDefaults(DpiEngineType.SingBox),
+                    ct).ConfigureAwait(false);
+
+            case DpiRunMode.SingBoxZapret:
+                await StopAllAsync(ct).ConfigureAwait(false);
+                var s1 = await StartAsync(DpiEngineType.SingBox, CloneWithDefaults(DpiEngineType.SingBox), ct).ConfigureAwait(false);
+                var sz1 = await StartAsync(DpiEngineType.Zapret,
+                    profile.EngineType == DpiEngineType.Zapret ? profile : CloneWithDefaults(DpiEngineType.Zapret),
+                    ct).ConfigureAwait(false);
+                return s1 || sz1;
+
             case DpiRunMode.Bypass:
                 await StopAllAsync(ct).ConfigureAwait(false);
                 return true;
@@ -212,6 +230,11 @@ public sealed class DpiEngineManager : IDisposable
             {
                 EngineType = DpiEngineType.Warp,
                 SocksPort = 8086
+            },
+            DpiEngineType.SingBox => new EngineProfile
+            {
+                EngineType = DpiEngineType.SingBox,
+                SocksPort = 2080
             },
             _ => new EngineProfile { EngineType = type },
         };

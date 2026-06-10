@@ -37,6 +37,144 @@ public interface IWarpUpdaterService
     Task<bool> InstallUpdateAsync(string warpDir, UpdateInfo update, Action<string> onProgress, CancellationToken ct = default);
 }
 
+public interface ISingBoxUpdaterService
+{
+    string GetLocalVersion(string singBoxDir);
+    Task<(UpdateInfo? update, string? error)> CheckForUpdateAsync(string singBoxDir, CancellationToken ct = default);
+    Task<(UpdateInfo? update, string? error)> GetLatestReleaseAsync(CancellationToken ct = default);
+    Task<bool> InstallUpdateAsync(string singBoxDir, UpdateInfo update, Action<string> onProgress, CancellationToken ct = default);
+}
+
+public sealed partial class SingBoxUpdaterService : ISingBoxUpdaterService
+{
+    private const string ApiUrl = "https://api.github.com/repos/SagerNet/sing-box/releases/latest";
+    private const string VersionFile = "version.txt";
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public SingBoxUpdaterService(IHttpClientFactory httpClientFactory)
+    {
+        _httpClientFactory = httpClientFactory;
+    }
+
+    public SingBoxUpdaterService() : this(new FluxRoute.Core.Services.DefaultHttpClientFactory()) { }
+
+    public string GetLocalVersion(string singBoxDir)
+    {
+        var path = Path.Combine(singBoxDir, VersionFile);
+        if (File.Exists(path))
+        {
+            try { return File.ReadAllText(path).Trim(); }
+            catch { }
+        }
+        return "unknown";
+    }
+
+    private void SaveLocalVersion(string singBoxDir, string version)
+    {
+        var path = Path.Combine(singBoxDir, VersionFile);
+        File.WriteAllText(path, version.TrimStart('v', 'V'));
+    }
+
+    public async Task<(UpdateInfo? update, string? error)> GetLatestReleaseAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            using var http = _httpClientFactory.CreateClient(HttpClientNames.Updater);
+            http.DefaultRequestHeaders.Remove("User-Agent");
+            http.DefaultRequestHeaders.Add("User-Agent", "FluxRoute-SingBox-Updater");
+
+            var json = await http.GetStringAsync(ApiUrl, ct).ConfigureAwait(false);
+
+            var tagMatch = Regex.Match(json, @"""tag_name""\s*:\s*""([^""]+)""");
+            var urlMatch = Regex.Match(json, @"""browser_download_url""\s*:\s*""([^""]*sing-box[^""]*windows-amd64\.zip)""", RegexOptions.IgnoreCase);
+            var bodyMatch = Regex.Match(json, @"""body""\s*:\s*""([^""]*)""");
+
+            if (!tagMatch.Success)
+                return (null, "Не удалось найти tag_name в ответе GitHub API");
+
+            var version = tagMatch.Groups[1].Value.TrimStart('v', 'V');
+            var downloadUrl = urlMatch.Success ? urlMatch.Groups[1].Value : "";
+            var notes = bodyMatch.Success ? bodyMatch.Groups[1].Value : "";
+
+            return (new UpdateInfo
+            {
+                Version = version,
+                DownloadUrl = downloadUrl,
+                ReleaseNotes = notes
+            }, null);
+        }
+        catch (HttpRequestException ex) { return (null, $"Ошибка сети: {ex.Message}"); }
+        catch (TaskCanceledException) { return (null, "Таймаут запроса"); }
+        catch (Exception ex) { return (null, $"Ошибка: {ex.Message}"); }
+    }
+
+    public async Task<(UpdateInfo? update, string? error)> CheckForUpdateAsync(string singBoxDir, CancellationToken ct = default)
+    {
+        var (release, error) = await GetLatestReleaseAsync(ct).ConfigureAwait(false);
+        if (release is null) return (null, error);
+
+        var local = GetLocalVersion(singBoxDir);
+        if (local == release.Version)
+            return (null, null);
+
+        return (release, null);
+    }
+
+    public async Task<bool> InstallUpdateAsync(string singBoxDir, UpdateInfo update, Action<string> onProgress, CancellationToken ct = default)
+    {
+        var tempZip = Path.Combine(Path.GetTempPath(), "singbox_update.zip");
+        var tempExtract = Path.Combine(Path.GetTempPath(), "singbox_update_extract");
+
+        try
+        {
+            onProgress($"⬇️ Скачиваем Sing-Box {update.Version}...");
+
+            using var http = _httpClientFactory.CreateClient(HttpClientNames.Updater);
+            http.DefaultRequestHeaders.Remove("User-Agent");
+            http.DefaultRequestHeaders.Add("User-Agent", "FluxRoute-SingBox-Updater");
+
+            var url = update.DownloadUrl;
+            if (string.IsNullOrEmpty(url)) return false;
+
+            var bytes = await http.GetByteArrayAsync(url, ct).ConfigureAwait(false);
+
+            await File.WriteAllBytesAsync(tempZip, bytes, ct).ConfigureAwait(false);
+            if (Directory.Exists(tempExtract))
+                Directory.Delete(tempExtract, recursive: true);
+            ZipFile.ExtractToDirectory(tempZip, tempExtract);
+
+            var exeFile = Directory.EnumerateFiles(tempExtract, "sing-box.exe", SearchOption.AllDirectories).FirstOrDefault();
+            if (exeFile is null)
+            {
+                onProgress("❌ sing-box.exe не найден в архиве");
+                return false;
+            }
+
+            Directory.CreateDirectory(singBoxDir);
+            File.Copy(exeFile, Path.Combine(singBoxDir, "sing-box.exe"), overwrite: true);
+
+            SaveLocalVersion(singBoxDir, update.Version);
+            onProgress($"✅ Sing-Box {update.Version} установлен!");
+            return true;
+        }
+        catch (OperationCanceledException)
+        {
+            onProgress("⚠️ Обновление Sing-Box отменено.");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            onProgress($"❌ Ошибка: {ex.Message}");
+            return false;
+        }
+        finally
+        {
+            try { File.Delete(tempZip); } catch { }
+            try { Directory.Delete(tempExtract, recursive: true); } catch { }
+        }
+    }
+}
+
 public sealed partial class WarpUpdaterService : IWarpUpdaterService
 {
     private const string ApiUrl = "https://api.github.com/repos/bepass-org/warp-plus/releases/latest";

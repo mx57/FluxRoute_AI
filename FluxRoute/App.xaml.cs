@@ -123,6 +123,7 @@ public partial class App : Application
         services.AddSingleton<IUpdaterService, UpdaterService>();
         services.AddSingleton<IByeDpiUpdaterService, ByeDpiUpdaterService>();
         services.AddSingleton<IWarpUpdaterService, WarpUpdaterService>();
+        services.AddSingleton<ISingBoxUpdaterService, SingBoxUpdaterService>();
         services.AddSingleton<IAppUpdaterService, AppUpdaterService>();
         services.AddSingleton<IConnectivityChecker, ConnectivityChecker>();
 
@@ -171,6 +172,11 @@ public partial class App : Application
             return new BatMaterializer(() => engineDir);
         });
 
+        services.AddSingleton<CloudSyncService>(sp =>
+            new CloudSyncService(
+                sp.GetRequiredService<IHttpClientFactory>().CreateClient(),
+                sp.GetRequiredService<AiStrategyRegistry>()));
+
         services.AddSingleton(sp =>
             new NetworkChangeWatcher(sp.GetRequiredService<NetworkFingerprintProvider>()));
 
@@ -180,6 +186,7 @@ public partial class App : Application
             sp.GetRequiredService<IAppUpdaterService>(),
             sp.GetRequiredService<IByeDpiUpdaterService>(),
             sp.GetRequiredService<IWarpUpdaterService>(),
+            sp.GetRequiredService<ISingBoxUpdaterService>(),
             sp.GetRequiredService<IConnectivityChecker>(),
             sp.GetRequiredService<DpiEngineManager>(),
             sp.GetRequiredService<NetworkFingerprintProvider>(),

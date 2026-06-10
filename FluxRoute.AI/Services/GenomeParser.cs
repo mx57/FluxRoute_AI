@@ -261,4 +261,37 @@ public static class GenomeParser
             or "--ttl" or "--fake-tls-mod" or "--fake-sni" or "--fake-data"
             or "--mod-http" or "--tlsminor" or "--tlsrec" or "--hosts" or "--hostlist"
             or "--cache-ttl" or "--auto" or "--timeout" or "--auto-mode" or "--pf" or "--proto";
+
+    public static StrategyGenome FromSingBoxArgs(IReadOnlyList<string> args, string displayName, StrategyOrigin origin)
+    {
+        var g = new StrategyGenome
+        {
+            DisplayName = displayName,
+            Origin = origin,
+            EngineType = DpiEngineType.SingBox,
+        };
+
+        var i = 0;
+        while (i < args.Count)
+        {
+            var a = args[i];
+            if (a == "-c" || a == "--config")
+            {
+                if (i + 1 < args.Count)
+                {
+                    g.ExtraArgs.Add(a);
+                    g.ExtraArgs.Add(args[i + 1]);
+                    i += 2;
+                }
+                else i++;
+            }
+            else
+            {
+                g.ExtraArgs.Add(a);
+                i++;
+            }
+        }
+
+        return g;
+    }
 }

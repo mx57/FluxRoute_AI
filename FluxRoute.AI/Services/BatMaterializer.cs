@@ -24,6 +24,8 @@ public sealed class BatMaterializer
             return WriteByeDpiBat(g, engineDir);
         if (g.EngineType == DpiEngineType.Warp)
             return WriteWarpBat(g, engineDir);
+        if (g.EngineType == DpiEngineType.SingBox)
+            return WriteSingBoxBat(g, engineDir);
 
         return WriteZapretBat(g, engineDir);
     }
@@ -59,6 +61,27 @@ public sealed class BatMaterializer
         sb.AppendLine("@echo off");
         sb.AppendLine($"cd /d \"{byedpiDir}\"");
         sb.AppendLine($"start /min \"\" ciadpi.exe {argLine}");
+        sb.AppendLine("exit");
+
+        var dir = Path.Combine(engineDir, "ai-evolved");
+        Directory.CreateDirectory(dir);
+        var safeName = SanitizeFileName(g.DisplayName);
+        var path = Path.Combine(dir, $"{safeName}.bat");
+        File.WriteAllText(path, sb.ToString(), new UTF8Encoding(false));
+        return path;
+    }
+
+    private string WriteSingBoxBat(StrategyGenome g, string engineDir)
+    {
+        var singboxDir = Path.Combine(engineDir, "sing-box");
+        Directory.CreateDirectory(singboxDir);
+
+        var configPath = g.ExtraArgs.FirstOrDefault(x => x.EndsWith(".json")) ?? "config.json";
+
+        var sb = new StringBuilder();
+        sb.AppendLine("@echo off");
+        sb.AppendLine($"cd /d \"{singboxDir}\"");
+        sb.AppendLine($"start /min \"\" sing-box.exe run -c \"{configPath}\"");
         sb.AppendLine("exit");
 
         var dir = Path.Combine(engineDir, "ai-evolved");

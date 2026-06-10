@@ -46,5 +46,12 @@ public sealed class EngineProfile
     public bool ScanEnabled { get; set; }
     public string? Reserved { get; set; }
 
+    // Sing-Box
+    public string? SingBoxOutboundType { get; set; }
+    public string? SingBoxProtocol { get; set; }
+    public bool SingBoxReality { get; set; }
+    public string? SingBoxServer { get; set; }
+    public int? SingBoxPort { get; set; }
+
     public List<string> ExtraArgs { get; set; } = [];
 }

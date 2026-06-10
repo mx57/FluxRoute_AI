@@ -53,6 +53,13 @@ public sealed class StrategyGenome
     public bool ScanEnabled { get; set; }
     public string? Reserved { get; set; }
 
+    // Sing-Box parameters
+    public string? SingBoxOutboundType { get; set; }
+    public string? SingBoxProtocol { get; set; }
+    public bool SingBoxReality { get; set; }
+    public string? SingBoxServer { get; set; }
+    public int? SingBoxPort { get; set; }
+
     public List<string> ExtraArgs { get; set; } = [];
 
     public string DisplayName { get; set; } = "";
@@ -105,6 +112,11 @@ public sealed class StrategyGenome
             PsiphonCountry = PsiphonCountry,
             ScanEnabled = ScanEnabled,
             Reserved = Reserved,
+            SingBoxOutboundType = SingBoxOutboundType,
+            SingBoxProtocol = SingBoxProtocol,
+            SingBoxReality = SingBoxReality,
+            SingBoxServer = SingBoxServer,
+            SingBoxPort = SingBoxPort,
             ExtraArgs = [..ExtraArgs],
         };
     }

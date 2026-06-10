@@ -9,7 +9,7 @@ public sealed class StrategyEvolver
     private static readonly string[] SemanticMarkers = ["host", "endhost", "midsld", "sniext", "endsld"];
     private static readonly string[] DesyncModes = ["split", "fake", "fakesplit", "disorder", "fakedisorder", "multidisorder", "multisplit"];
     private static readonly string[] FakeTlsMods = ["orig", "rand", "rndsni", "dupsid", "padencap"];
-    private static readonly DpiEngineType[] EngineTypes = [DpiEngineType.Zapret, DpiEngineType.ByeDpi, DpiEngineType.Warp];
+    private static readonly DpiEngineType[] EngineTypes = [DpiEngineType.Zapret, DpiEngineType.ByeDpi, DpiEngineType.Warp, DpiEngineType.SingBox];
     private static readonly string[] SplitPosCandidates = ["1", "2", "3", "7", "10", "1+s", "2+s", "3+s", "host", "midsld", "sniext"];
     private static readonly string[] DisorderPosCandidates = ["1", "3", "5", "1+s", "3+s"];
     private static readonly string[] FakePosCandidates = ["-1", "3", "7", "10"];
@@ -242,9 +242,28 @@ public sealed class StrategyEvolver
         {
             MutateWarp(g, roll);
         }
+        else if (g.EngineType == DpiEngineType.SingBox)
+        {
+            MutateSingBox(g, roll);
+        }
         else
         {
             MutateZapret(g, roll);
+        }
+    }
+
+    private void MutateSingBox(StrategyGenome g, int roll)
+    {
+        switch (roll)
+        {
+            case 0:
+                g.EngineType = DpiEngineType.Zapret;
+                break;
+            case 1:
+                g.SingBoxReality = !g.SingBoxReality;
+                break;
+            default:
+                break;
         }
     }
 

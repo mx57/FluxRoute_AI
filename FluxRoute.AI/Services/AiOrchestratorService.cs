@@ -299,6 +299,7 @@ public sealed class AiOrchestratorService : IDisposable
         {
             DpiEngineType.ByeDpi => "byedpi",
             DpiEngineType.Warp => "warp",
+            DpiEngineType.SingBox => "singbox",
             _ => "zapret"
         };
         var failureSig = !result.ProcessStable
@@ -590,6 +591,8 @@ public sealed class AiOrchestratorService : IDisposable
             (int)DpiEngineMode.Hybrid => all.Where(g => g.EngineType is DpiEngineType.Zapret or DpiEngineType.ByeDpi).ToList(),
             (int)DpiEngineMode.WarpZapret => all.Where(g => g.EngineType is DpiEngineType.Warp or DpiEngineType.Zapret).ToList(),
             (int)DpiEngineMode.WarpByeDpi => all.Where(g => g.EngineType is DpiEngineType.Warp or DpiEngineType.ByeDpi).ToList(),
+            (int)DpiEngineMode.SingBox => all.Where(g => g.EngineType == DpiEngineType.SingBox).ToList(),
+            (int)DpiEngineMode.SingBoxZapret => all.Where(g => g.EngineType is DpiEngineType.SingBox or DpiEngineType.Zapret).ToList(),
             _ => all.Where(g => g.EngineType == DpiEngineType.Zapret).ToList(),
         };
     }
@@ -655,6 +658,7 @@ public sealed class AiOrchestratorService : IDisposable
         {
             DpiEngineType.ByeDpi => g.ToEngineProfile().SocksPort,
             DpiEngineType.Warp => 8086,
+            DpiEngineType.SingBox => 2080,
             _ => (int?)null
         };
 
@@ -670,7 +674,12 @@ public sealed class AiOrchestratorService : IDisposable
                 UseCurlForHttp = probeOptions.UseCurlForHttp,
                 MaxParallelChecks = probeOptions.MaxParallelChecks,
                 Socks5Endpoint = $"127.0.0.1:{socksPort}",
-                ProcessName = g.EngineType == DpiEngineType.Warp ? "warp-plus" : "ciadpi",
+                ProcessName = g.EngineType switch
+                {
+                    DpiEngineType.Warp => "warp-plus",
+                    DpiEngineType.SingBox => "sing-box",
+                    _ => "ciadpi"
+                },
             };
         }
         var result = await _probeService.ProbeCurrentAsync(testProfile, targets, probeOptions, ct).ConfigureAwait(false);
@@ -682,6 +691,7 @@ public sealed class AiOrchestratorService : IDisposable
         {
             DpiEngineType.ByeDpi => "byedpi",
             DpiEngineType.Warp => "warp",
+            DpiEngineType.SingBox => "singbox",
             _ => "zapret"
         };
         var failureSig = !result.ProcessStable

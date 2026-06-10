@@ -5,7 +5,8 @@ public enum DpiEngineType
     Zapret,
     ByeDpi,
     GoodbyeDpi,
-    Warp
+    Warp,
+    SingBox
 }
 
 public enum DpiEngineMode
@@ -15,5 +16,7 @@ public enum DpiEngineMode
     Warp = 2,
     Hybrid = 3,
     WarpZapret = 4,
-    WarpByeDpi = 5
+    WarpByeDpi = 5,
+    SingBox = 6,
+    SingBoxZapret = 7
 }

@@ -16,6 +16,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
     private readonly IAppUpdaterService _appUpdater;
     private readonly IByeDpiUpdaterService _byeDpiUpdater;
     private readonly IWarpUpdaterService _warpUpdater;
+    private readonly ISingBoxUpdaterService _singBoxUpdater;
     private readonly Func<string> _getEngineDir;
     private readonly Func<bool> _getAutoUpdateEnabled;
     private readonly Func<string> _getCurrentEngineVersion;
@@ -60,11 +61,19 @@ public sealed partial class UpdatesViewModel : ObservableObject
     [ObservableProperty] private bool isWarpUpdating;
     private UpdateInfo? _pendingWarpUpdate;
 
+    // ── Sing-Box ──────────────────────────────────────────────────────────
+    [ObservableProperty] private string singBoxVersion = "—";
+    [ObservableProperty] private string singBoxLatestVersion = "—";
+    [ObservableProperty] private string singBoxUpdateStatus = "Не проверялось";
+    [ObservableProperty] private bool isSingBoxUpdating;
+    private UpdateInfo? _pendingSingBoxUpdate;
+
     public UpdatesViewModel(
         IUpdaterService updater,
         IAppUpdaterService appUpdater,
         IByeDpiUpdaterService byeDpiUpdater,
         IWarpUpdaterService warpUpdater,
+        ISingBoxUpdaterService singBoxUpdater,
         Func<string> getEngineDir,
         Func<bool> getAutoUpdateEnabled,
         Func<string> getCurrentEngineVersion,
@@ -79,6 +88,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
         _appUpdater = appUpdater;
         _byeDpiUpdater = byeDpiUpdater;
         _warpUpdater = warpUpdater;
+        _singBoxUpdater = singBoxUpdater;
         _getEngineDir = getEngineDir;
         _getAutoUpdateEnabled = getAutoUpdateEnabled;
         _getCurrentEngineVersion = getCurrentEngineVersion;
@@ -92,11 +102,13 @@ public sealed partial class UpdatesViewModel : ObservableObject
         CurrentAppVersion = _appUpdater.GetCurrentVersion();
         RefreshByeDpiVersion();
         RefreshWarpVersion();
+        RefreshSingBoxVersion();
     }
 
     private string EngineDir => _getEngineDir();
     private string ByeDpiDir => Path.Combine(EngineDir, "byedpi");
     private string WarpDir => Path.Combine(EngineDir, "warp");
+    private string SingBoxDir => Path.Combine(EngineDir, "sing-box");
 
     private void AddLog(string message)
     {
@@ -113,6 +125,11 @@ public sealed partial class UpdatesViewModel : ObservableObject
     private void RefreshWarpVersion()
     {
         WarpVersion = _warpUpdater.GetLocalVersion(WarpDir);
+    }
+
+    private void RefreshSingBoxVersion()
+    {
+        SingBoxVersion = _singBoxUpdater.GetLocalVersion(SingBoxDir);
     }
 
     public async Task CheckOnStartupAsync()
@@ -560,5 +577,68 @@ public sealed partial class UpdatesViewModel : ObservableObject
         }
 
         IsWarpUpdating = false;
+    }
+
+    [RelayCommand]
+    private async Task CheckSingBoxUpdate()
+    {
+        SingBoxUpdateStatus = "🔍 Проверяем Sing-Box...";
+        SingBoxLatestVersion = "…";
+
+        var (update, checkError) = await _singBoxUpdater.CheckForUpdateAsync(SingBoxDir);
+
+        if (update is null)
+        {
+            if (checkError is not null)
+            {
+                SingBoxUpdateStatus = $"❌ {checkError}";
+                AddLog($"❌ Sing-Box: {checkError}");
+            }
+            else
+            {
+                SingBoxUpdateStatus = $"✅ Актуальная версия ({SingBoxVersion})";
+                AddLog("✅ Sing-Box: обновлений нет");
+            }
+            return;
+        }
+
+        _pendingSingBoxUpdate = update;
+        SingBoxLatestVersion = update.Version;
+        SingBoxUpdateStatus = $"⬆️ Доступна версия {update.Version}";
+        AddLog($"⬆️ Sing-Box: {update.Version}");
+    }
+
+    [RelayCommand]
+    private async Task InstallSingBoxUpdate()
+    {
+        if (_pendingSingBoxUpdate is null)
+        {
+            await CheckSingBoxUpdate();
+            if (_pendingSingBoxUpdate is null) return;
+        }
+
+        IsSingBoxUpdating = true;
+        var success = await _singBoxUpdater.InstallUpdateAsync(SingBoxDir, _pendingSingBoxUpdate,
+            msg =>
+            {
+                if (Application.Current != null && !Application.Current.Dispatcher.HasShutdownStarted)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        SingBoxUpdateStatus = msg;
+                        AddLog(msg);
+                        _addAppLog(msg);
+                    });
+                }
+            });
+
+        if (success)
+        {
+            RefreshSingBoxVersion();
+            _pendingSingBoxUpdate = null;
+            SingBoxUpdateStatus = $"✅ Sing-Box {SingBoxVersion}";
+        }
+
+        IsSingBoxUpdating = false;
     }
 }

@@ -6,7 +6,7 @@
   <img width="650" alt="FluxRoute AI Logo" src="./assets/FluxRoute-dark.svg" />
 </picture>
 
-# FluxRoute AI `v1.6.2`
+# FluxRoute AI `v1.7.0-alpha`
 
 ### ⚡ Intelligent Swiss Army Knife for DPI Bypass on Windows
 
@@ -88,8 +88,8 @@ The system literally "grows" new BAT profiles. it crosses parameters of the most
 
 ## 📅 Roadmap (Future)
 
-- [ ] **Sing-Box Integration:** Support for VLESS, Reality, and other cutting-edge protocols.
-- [ ] **P2P Genome Sharing:** Optionally share successful "mutations" with the community anonymously.
+- [x] **Sing-Box Integration:** Support for VLESS, Reality, and other cutting-edge protocols.
+- [x] **Cloud AI Sync:** Optionally share successful "mutations" with the community anonymously.
 - [ ] **Traffic Visualization:** Real-time throughput and bypass efficiency graphs.
 
 ---

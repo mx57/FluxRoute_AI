@@ -684,6 +684,24 @@
                                     </StackPanel>
                                 </Button>
 
+                                <!-- Nav: Sing-Box -->
+                                <Button Height="36" Command="{Binding SelectTabCommand}" CommandParameter="11" d:IsLocked="True">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource NavBtn}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedTabIndex}" Value="11">
+                                                    <Setter Property="Foreground" Value="#E6EDF3"/>
+                                                    <Setter Property="Background" Value="#161B22"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                    <StackPanel Orientation="Horizontal" d:IsLocked="True">
+                                        <TextBlock Text="📦" Width="20" TextAlignment="Center" d:IsLocked="True"/>
+                                        <TextBlock Text="Sing-Box" Margin="6,0,0,0" Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}" d:IsLocked="True"/>
+                                    </StackPanel>
+                                </Button>
+
                                 <!-- Nav: Логи -->
                                 <Button Height="36" Command="{Binding SelectTabCommand}" CommandParameter="8" d:IsLocked="True">
                                     <Button.Style>
@@ -929,6 +947,8 @@
                                                         <ComboBoxItem Content="⚡🔒 Hybrid" d:IsLocked="True"/>
                                                         <ComboBoxItem Content="🌐⚡ Warp + Zapret" d:IsLocked="True"/>
                                                         <ComboBoxItem Content="🌐🔒 Warp + ByeDPI" d:IsLocked="True"/>
+                                                        <ComboBoxItem Content="📦 Sing-Box" d:IsLocked="True"/>
+                                                        <ComboBoxItem Content="📦⚡ Sing-Box + Zapret" d:IsLocked="True"/>
                                                     </ComboBox>
                                                 </StackPanel>
                                                 <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="#8B949E" Margin="0,2,0,0" d:IsLocked="True">
@@ -1221,6 +1241,8 @@
                                             <ComboBoxItem Content="⚡🔒 Hybrid" d:IsLocked="True"/>
                                             <ComboBoxItem Content="🌐⚡ Warp + Zapret" d:IsLocked="True"/>
                                             <ComboBoxItem Content="🌐🔒 Warp + ByeDPI" d:IsLocked="True"/>
+                                                <ComboBoxItem Content="📦 Sing-Box" d:IsLocked="True"/>
+                                                <ComboBoxItem Content="📦⚡ Sing-Box + Zapret" d:IsLocked="True"/>
                                         </ComboBox>
                                     </StackPanel>
 
@@ -1495,6 +1517,37 @@
                                         <Button Content="⬆️ Установить" Style="{StaticResource TermBtn}"
                                                 Command="{Binding Updates.InstallByeDpiUpdateCommand}"
                                                 IsEnabled="{Binding Updates.IsByeDpiUpdating, Converter={StaticResource InvBool}}" d:IsLocked="True"/>
+                                    </StackPanel>
+
+                                    <Rectangle Style="{StaticResource Sep}" d:IsLocked="True"/>
+
+                                    <!-- SING-BOX -->
+                                    <TextBlock Style="{StaticResource SecH}" Text="SING-BOX" Margin="0,8,0,8" d:IsLocked="True"/>
+                                    <Grid Margin="0,0,0,10" d:IsLocked="True">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="140"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="26"/>
+                                            <RowDefinition Height="26"/>
+                                            <RowDefinition Height="26"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource Lbl}" Text="Текущая версия:" d:IsLocked="True"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource Val}" Text="{Binding Updates.SingBoxVersion}" d:IsLocked="True"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource Lbl}" Text="Доступна:" d:IsLocked="True"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource Val}" Text="{Binding Updates.SingBoxLatestVersion}" d:IsLocked="True"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource Lbl}" Text="Статус:" d:IsLocked="True"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource Val}" Text="{Binding Updates.SingBoxUpdateStatus}" d:IsLocked="True"/>
+                                    </Grid>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12" d:IsLocked="True">
+                                        <Button Content="🔍 Проверить обновления" Style="{StaticResource TermBtn}"
+                                                Margin="0,0,10,0"
+                                                Command="{Binding Updates.CheckSingBoxUpdateCommand}"
+                                                IsEnabled="{Binding Updates.IsSingBoxUpdating, Converter={StaticResource InvBool}}" d:IsLocked="True"/>
+                                        <Button Content="⬆️ Установить" Style="{StaticResource TermBtn}"
+                                                Command="{Binding Updates.InstallSingBoxUpdateCommand}"
+                                                IsEnabled="{Binding Updates.IsSingBoxUpdating, Converter={StaticResource InvBool}}" d:IsLocked="True"/>
                                     </StackPanel>
 
                                     <Rectangle Style="{StaticResource Sep}" d:IsLocked="True"/>
@@ -1998,6 +2051,54 @@
                                             <TextBox Text="{Binding WarpConfigResult}" Height="200"
                                                      AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
                                                      IsReadOnly="True" FontFamily="Consolas" FontSize="11" d:IsLocked="True"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Border>
+
+                        <!-- ╔══════════════════════════════════════╗ -->
+                        <!-- ║          TAB 11: SING-BOX           ║ -->
+                        <!-- ╚══════════════════════════════════════╝ -->
+                        <Border d:IsLocked="True">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Setter Property="Opacity" Value="0"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedTabIndex}" Value="11">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                         From="0" To="1" Duration="0:0:0.3">
+                                                            <DoubleAnimation.EasingFunction>
+                                                                <CubicEase EasingMode="EaseOut"/>
+                                                            </DoubleAnimation.EasingFunction>
+                                                        </DoubleAnimation>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16,12" d:IsLocked="True">
+                                <StackPanel d:IsLocked="True">
+                                    <TextBlock Text="Sing-Box" Foreground="#4FC3F7" FontSize="14"
+                                               FontWeight="Bold" Margin="0,0,0,4" d:IsLocked="True"/>
+                                    <TextBlock Text="Управление универсальным ядром Sing-Box (VLESS, Reality, Shadowsocks)."
+                                               Foreground="#8B949E" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,14" d:IsLocked="True"/>
+
+                                    <Border Style="{StaticResource Card}" d:IsLocked="True">
+                                        <StackPanel d:IsLocked="True">
+                                            <TextBlock Text="Конфигурация (config.json)" Style="{StaticResource SecH}" d:IsLocked="True"/>
+                                            <TextBlock Text="Sing-Box требует файл конфигурации в папке engine/sing-box/config.json."
+                                                       Foreground="#8B949E" FontSize="11" Margin="0,0,0,10" d:IsLocked="True"/>
+
+                                            <Button Content="🔍 Проверить установку" Style="{StaticResource TermBtn}"
+                                                    HorizontalAlignment="Left" d:IsLocked="True"/>
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
