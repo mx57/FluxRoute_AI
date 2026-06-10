@@ -10,7 +10,7 @@
 
 ### ⚡ Intelligent Swiss Army Knife for DPI Bypass on Windows
 
-**A self-learning system that unifies Zapret, ByeDPI, and Cloudflare Warp into a single adaptive mechanism.**
+**A self-learning system that unifies Zapret, ByeDPI, Warp, and Sing-Box into a single adaptive mechanism.**
 
 [🇷🇺 Русская версия](README.md) | [📥 Download Release](https://github.com/mx57/FluxRoute_AI/releases) | [🐛 Report an Issue](https://github.com/mx57/FluxRoute_AI/issues)
 
@@ -31,10 +31,10 @@
 Typical GUIs for DPI tools just launch processes. **FluxRoute AI** goes further — it **thinks**. Censorship and DPI filters change constantly, and what worked yesterday might fail today. Our system uses mathematical models to automatically adapt to your specific ISP and network.
 
 ### 🧠 Artificial Intelligence (Thompson Sampling)
-Instead of manually guessing which profile to use, the AI Orchestrator analyzes the success of every connection attempt. It balances between using the current "Gold Standard" strategy and exploring new, potentially more effective parameter combinations.
+Instead of manually guessing which profile to use, the AI Orchestrator analyzes the success of every connection attempt. It uses a **Multi-armed bandits** algorithm to balance between using reliable strategies and exploring new ones.
 
-### 🧬 Genetic Evolution
-The system literally "grows" new BAT profiles. it crosses parameters of the most successful strategies, applies random mutations (desync, split, fake-tls), and verifies the results. Only the fittest configurations survive.
+### 🧬 Genetic Evolution (StrategyEvolver)
+The system literally "grows" new BAT profiles. It crosses parameters of the most successful strategies, applies random mutations, and verifies the results. Only the fittest configurations survive.
 
 ---
 
@@ -42,23 +42,23 @@ The system literally "grows" new BAT profiles. it crosses parameters of the most
 
 | Category | Features |
 | :--- | :--- |
-| **Engine Support** | Zapret (`winws.exe`), ByeDPI (`ciadpi.exe`), Cloudflare Warp (`warp-plus.exe`). |
-| **Operating Modes** | **Standalone** (single engine), **Hybrid** (smart Zapret/ByeDPI toggle), **Parallel** (multiple engines), **Chained** (SOCKS5 tunnel chain). |
-| **Intelligence** | Thompson Sampling, Wilson Lower Bound (confidence intervals), Fast Start (instant warm-up of TOP strategies). |
-| **Networking** | Per-network AI policy (Network Fingerprinting), Auto-MTU discovery for Warp. |
-| **Automation** | Full lifecycle: from Warp account registration to automated binary updates from GitHub. |
+| **Engine Support** | Zapret, ByeDPI, Cloudflare Warp, and **Sing-Box** (VLESS, Reality). |
+| **Operating Modes** | Standalone, Hybrid, Parallel, and Chained (via SOCKS5/Tunstall). |
+| **Intelligence** | Thompson Sampling, Wilson Lower Bound, Fast Start, Cloud AI Sync. |
+| **Networking** | Per-network AI policy, Auto-MTU discovery, AmneziaWG support. |
+| **Automation** | Full lifecycle: automated engine binary updates from GitHub. |
 
 ---
 
-## 🚀 New in v1.6.2
+## 🚀 New in Version 1.7.0-alpha
 
-> [!IMPORTANT]
-> This is a major update focused on the synergy between traditional DPI tools and modern VPN technologies.
+> [!TIP]
+> We are pushing boundaries — FluxRoute AI now works with modern protocols and shares experience via the cloud.
 
-- **🌐 Cloudflare Warp (WireGuard/AmneziaWG):** Native integration. Use Warp as standalone protection or as a "tunnel-in-a-tunnel" for Zapret.
-- **⚡ Chaining Mode:** Run Zapret/ByeDPI with traffic routed through Warp. This bypasses filters based on both packet signatures and IP address lists.
-- **🎯 Wilson Score 2.0:** Refined ranking logic. The AI now more accurately weighs strategy reliability using a 14-day rolling history.
-- **🧪 Deep Mutations:** Genetic evolution now explores `DesyncAnyProtocol`, `DesyncFooling`, and `FakeResend` parameters.
+- **📦 Sing-Box Integration:** Support for the most versatile core. Use VLESS, Reality, and Shadowsocks directly within FluxRoute.
+- **☁️ Cloud AI Sync (Beta):** Infrastructure for anonymous strategy "genome" exchange between users.
+- **🔄 Engine 4.0:** The AI now manages four engines simultaneously, picking the most effective one for current conditions.
+- **⚡ Core Optimization:** Improved performance for the strategy registry and logging system.
 
 ---
 
@@ -75,39 +75,22 @@ The system literally "grows" new BAT profiles. it crosses parameters of the most
 
 ---
 
-## ⚙️ Mode Comparison
-
-| Mode | Best For | ISP Evasion Difficulty |
-| :--- | :--- | :--- |
-| **Zapret** | YouTube, Discord, basic bypass. | Low (easily fingerprinted) |
-| **Warp** | IP-based blocks (Instagram, Twitter). | Medium (blocked by port/protocol) |
-| **Hybrid** | When ISP blocks change protocols randomly. | High |
-| **Chained** | Maximum penetration (DPI Bypass + VPN). | **Maximum** |
-
----
-
 ## 📅 Roadmap (Future)
 
-- [x] **Sing-Box Integration:** Support for VLESS, Reality, and other cutting-edge protocols.
-- [x] **Cloud AI Sync:** Optionally share successful "mutations" with the community anonymously.
-- [ ] **Traffic Visualization:** Real-time throughput and bypass efficiency graphs.
+- [x] **Sing-Box Integration:** Implemented in v1.7.0.
+- [x] **Cloud AI Sync:** Implemented in v1.7.0.
+- [ ] **Advanced YouTube Probing:** Check video buffering speed (4K/8K) to select the fastest profile.
+- [ ] **Mobile Remote:** Manage the desktop client via a Telegram bot.
 
 ---
 
-## ⚠️ Security & WinDivert
+## 🙏 Acknowledgments & License
 
-This project uses the **WinDivert** driver to modify network packets on-the-fly.
-- This is **not a virus**. It is a system administration tool.
-- Antivirus software (e.g., Kaspersky, Defender) may flag it as `HackTool` or `RiskTool`.
-- **Solution:** Add the application folder to your whitelist (exclusions).
+This project is free software distributed under the **GNU GPLv3** license.
 
----
-
-## 🙏 Acknowledgments
-
-- **[klondike0x/FluxRoute](https://github.com/klondike0x/FluxRoute)** — Foundation and architecture.
-- **[bol-van/zapret](https://github.com/bol-van/zapret)** — The legendary bypass core.
-- **[hiddify/warp-plus](https://github.com/hiddify/warp-plus)** — The best CLI Warp implementation.
+- **[klondike0x/FluxRoute](https://github.com/klondike0x/FluxRoute)** — Original author and architect.
+- **[bol-van/zapret](https://github.com/bol-van/zapret)** — Project core.
+- **[SagerNet/sing-box](https://github.com/SagerNet/sing-box)** — For the universal engine.
 
 ---
 
