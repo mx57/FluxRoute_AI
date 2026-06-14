@@ -26,7 +26,6 @@
 
         <!-- ══════ TERMINAL BUTTON ══════ -->
         <Style x:Key="TermBtn" TargetType="Button">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Foreground" Value="#8B949E"/>
@@ -85,6 +84,9 @@
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.4"/>
                             </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4FC3F7"/>
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -111,7 +113,6 @@
 
         <!-- ══════ NAV BUTTON ══════ -->
         <Style x:Key="NavBtn" TargetType="Button">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Foreground" Value="#8B949E"/>
@@ -166,6 +167,9 @@
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#4FC3F7"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -875,7 +879,8 @@
                                                            FontSize="12" FontWeight="Bold" Margin="0,0,0,8" d:IsLocked="True"/>
                                                 <ComboBox ItemsSource="{Binding Profiles}"
                                                           SelectedItem="{Binding SelectedProfile}"
-                                                          Margin="0,0,0,8" d:IsLocked="True">
+                                                          Margin="0,0,0,8" d:IsLocked="True"
+                                                          ToolTip="Выберите профиль DPI" AutomationProperties.Name="Выбор профиля DPI">
                                                     <ComboBox.ItemTemplate>
                                                         <DataTemplate>
                                                             <TextBlock Text="{Binding DisplayName}" FontFamily="Segoe UI"
@@ -937,7 +942,8 @@
                                                 </TextBlock>
                                                 <StackPanel Orientation="Horizontal" Margin="0,4,0,0" d:IsLocked="True">
                                                     <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="#8B949E" VerticalAlignment="Center" Margin="0,0,6,0" Text="Режим:" d:IsLocked="True"/>
-                                                    <ComboBox SelectedIndex="{Binding EngineMode}" Width="155" Height="24" FontFamily="Segoe UI" FontSize="11" d:IsLocked="True">
+                                                    <ComboBox SelectedIndex="{Binding EngineMode}" Width="155" Height="24" FontFamily="Segoe UI" FontSize="11" d:IsLocked="True"
+                                                              ToolTip="Выберите режим работы движков" AutomationProperties.Name="Выбор режима работы движков">
                                                         <ComboBoxItem Content="⚡ Zapret" d:IsLocked="True"/>
                                                         <ComboBoxItem Content="🔒 ByeDPI" d:IsLocked="True"/>
                                                         <ComboBoxItem Content="🌐 Warp" d:IsLocked="True"/>
@@ -1087,7 +1093,7 @@
                                                                             Visibility="{Binding CanDelete, Converter={StaticResource BoolToVis}}"
                                                                             Command="{Binding DataContext.DeleteAiStrategyCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                                             CommandParameter="{Binding}"
-                                                                            ToolTip="Удалить эволюционированную стратегию" d:IsLocked="True"/>
+                                                                            ToolTip="Удалить эволюционированную стратегию" AutomationProperties.Name="Удалить стратегию" d:IsLocked="True"/>
                                                                 </StackPanel>
                                                                 <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
                                                                     <StackPanel Orientation="Horizontal">
@@ -1229,7 +1235,8 @@
 
                                     <StackPanel Orientation="Horizontal" Margin="0,4,0,10" d:IsLocked="True">
                                         <TextBlock Style="{StaticResource Lbl}" Text="Режим работы движков: " VerticalAlignment="Center" Margin="0,0,8,0" d:IsLocked="True"/>
-                                        <ComboBox SelectedIndex="{Binding EngineMode}" Width="155" Height="24" FontFamily="Segoe UI" FontSize="11" d:IsLocked="True">
+                                        <ComboBox SelectedIndex="{Binding EngineMode}" Width="155" Height="24" FontFamily="Segoe UI" FontSize="11" d:IsLocked="True"
+                                                  ToolTip="Выберите режим работы движков" AutomationProperties.Name="Выбор режима работы движков">
                                             <ComboBoxItem Content="⚡ Zapret" d:IsLocked="True"/>
                                             <ComboBoxItem Content="🔒 ByeDPI" d:IsLocked="True"/>
                                             <ComboBoxItem Content="🌐 Warp" d:IsLocked="True"/>
@@ -1259,11 +1266,14 @@
 
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10" d:IsLocked="True">
                                         <Button Content="⚗ Эволюция сейчас" Style="{StaticResource AccentBtn}"
-                                                Margin="0,0,10,0" Command="{Binding RunAiEvolutionCommand}" d:IsLocked="True"/>
+                                                Margin="0,0,10,0" Command="{Binding RunAiEvolutionCommand}" d:IsLocked="True"
+                                                ToolTip="Запустить процесс эволюции стратегий ИИ" AutomationProperties.Name="Запустить эволюцию ИИ"/>
                                         <Button Content="↺ Сброс модели" Style="{StaticResource TermBtn}"
-                                                Margin="0,0,10,0" Command="{Binding ResetAiModelCommand}" d:IsLocked="True"/>
+                                                Margin="0,0,10,0" Command="{Binding ResetAiModelCommand}" d:IsLocked="True"
+                                                ToolTip="Сбросить накопленные данные модели ИИ" AutomationProperties.Name="Сбросить модель ИИ"/>
                                         <Button Content="📁 ai-evolved" Style="{StaticResource TermBtn}"
-                                                Command="{Binding OpenAiEvolvedFolderCommand}" d:IsLocked="True"/>
+                                                Command="{Binding OpenAiEvolvedFolderCommand}" d:IsLocked="True"
+                                                ToolTip="Открыть папку с эволюционировавшими стратегиями" AutomationProperties.Name="Открыть папку ИИ стратегий"/>
                                     </StackPanel>
 
                                     <Rectangle Style="{StaticResource Sep}" d:IsLocked="True"/>
@@ -2054,11 +2064,13 @@
                                             <TextBlock Text="Тип:" Foreground="#8B949E" VerticalAlignment="Center" Margin="0,0,6,0" d:IsLocked="True"/>
                                             <ComboBox Width="210" Height="28" Margin="0,0,10,8"
                                                       ItemsSource="{Binding LogCategoryFilters}"
-                                                      SelectedItem="{Binding SelectedLogCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True"/>
+                                                      SelectedItem="{Binding SelectedLogCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True"
+                                                      ToolTip="Фильтровать логи по категории" AutomationProperties.Name="Выбор категории логов"/>
 
                                             <TextBlock Text="Поиск:" Foreground="#8B949E" VerticalAlignment="Center" Margin="0,0,6,0" d:IsLocked="True"/>
                                             <TextBox Width="220" Height="28" Margin="0,0,10,8" VerticalContentAlignment="Center"
-                                                     Text="{Binding LogSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True"/>
+                                                     Text="{Binding LogSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True"
+                                                     ToolTip="Введите текст для поиска в логах" AutomationProperties.Name="Поиск в логах"/>
 
                                             <CheckBox Content="Только ошибки" Foreground="#C9D1D9" Margin="0,4,12,8"
                                                       VerticalAlignment="Center" IsChecked="{Binding LogsErrorsOnly, Mode=TwoWay}" d:IsLocked="True"/>
@@ -2330,7 +2342,8 @@
                                         <TextBox Grid.Column="0" Text="{Binding TgProxySecret, UpdateSourceTrigger=PropertyChanged}"
 															 Height="28" VerticalContentAlignment="Center" FontFamily="Consolas" d:IsLocked="True"/>
                                         <Button Grid.Column="2" Height="28" Width="36" Style="{StaticResource AccentBtn}"
-															Padding="0" Command="{Binding GenerateTgProxySecretCommand}" ToolTip="Генерировать Secret" d:IsLocked="True">
+															Padding="0" Command="{Binding GenerateTgProxySecretCommand}"
+                                                            ToolTip="Генерировать Secret" AutomationProperties.Name="Генерировать секрет" d:IsLocked="True">
                                             <TextBlock Text="🔄" FontSize="12" d:IsLocked="True"/>
                                         </Button>
                                     </Grid>

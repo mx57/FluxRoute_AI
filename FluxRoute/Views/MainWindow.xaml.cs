@@ -877,6 +877,7 @@ public partial class MainWindow : Window
             button.Style = termButtonStyle;
 
         WpfBindingOperations.SetBinding(button, WpfButton.CommandProperty, new WpfBinding(commandPath));
+        System.Windows.Automation.AutomationProperties.SetName(button, text);
         return button;
     }
 
