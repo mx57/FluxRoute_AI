@@ -154,7 +154,7 @@ public sealed partial class ServiceViewModel : ObservableObject
             };
             sc.Start();
             var output = sc.StandardOutput.ReadToEnd();
-            sc.WaitForExit(3000);
+            sc.WaitForExit(1000);
 
             if (output.Contains("RUNNING", StringComparison.OrdinalIgnoreCase))
                 ZapretServiceStatus = "✅ Запущена";

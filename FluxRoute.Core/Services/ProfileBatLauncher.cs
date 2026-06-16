@@ -222,7 +222,7 @@ public static class ProfileBatLauncher
     {
         try
         {
-            using var process = Process.Start(new ProcessStartInfo
+            var process = Process.Start(new ProcessStartInfo
             {
                 FileName = "netsh.exe",
                 Arguments = "interface tcp set global timestamps=enabled",
@@ -231,7 +231,12 @@ public static class ProfileBatLauncher
                 WindowStyle = ProcessWindowStyle.Hidden,
             });
 
-            process?.WaitForExit(2500);
+            if (process is not null)
+            {
+                process.EnableRaisingEvents = true;
+                process.Exited += (_, _) => process.Dispose();
+                if (process.HasExited) process.Dispose();
+            }
         }
         catch
         {
