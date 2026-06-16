@@ -124,13 +124,13 @@ public partial class MainViewModel
                 ProfileBatLauncher.TryCreateLaunchPlan(fullPath, engineDir, out plan, out parseError);
             }
             catch { }
-        }).ConfigureAwait(false);
+        });
 
         if (plan is not null)
         {
             try
             {
-                var winws = await Task.Run(() => ProfileBatLauncher.StartWinws(plan)).ConfigureAwait(false);
+                var winws = await Task.Run(() => ProfileBatLauncher.StartWinws(plan));
                 if (winws is null)
                 {
                     Logs.Add("Не удалось запустить winws.exe.");
@@ -177,7 +177,7 @@ public partial class MainViewModel
                     WindowStyle = ProcessWindowStyle.Hidden,
                 };
 
-                var cmdProcess = await Task.Run(() => Process.Start(psi)).ConfigureAwait(false);
+                var cmdProcess = await Task.Run(() => Process.Start(psi));
                 if (cmdProcess is null)
                 {
                     Logs.Add("Не удалось запустить процесс.");
