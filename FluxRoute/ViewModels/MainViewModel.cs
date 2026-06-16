@@ -131,7 +131,7 @@ public partial class MainViewModel : ObservableObject
         {
             Stop();
             await Task.Delay(1200).ConfigureAwait(false);
-            Application.Current.Dispatcher.Invoke(Start);
+            Application.Current.Dispatcher.BeginInvoke(async () => await StartAsync());
         }
 
         AddToRecentLogs($"✅ Пресет «{preset.Name}» применён");
@@ -252,7 +252,7 @@ public partial class MainViewModel : ObservableObject
         if (!_suppressProfileWarning && _settingsLoaded && IsRunning && newValue is not null)
         {
             Stop();
-            Start();
+            _ = StartAsync();
         }
     }
 
@@ -790,10 +790,10 @@ public partial class MainViewModel : ObservableObject
     private void ToggleLogs() => IsLogsVisible = !IsLogsVisible;
 
     [RelayCommand]
-    private void MainAction()
+    private async void MainAction()
     {
         if (IsRunning) Stop();
-        else Start();
+        else await StartAsync().ConfigureAwait(false);
     }
 
 

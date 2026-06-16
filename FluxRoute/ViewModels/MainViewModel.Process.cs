@@ -76,16 +76,16 @@ public partial class MainViewModel
     }
 
     [RelayCommand]
-    private void ToggleStartStop()
+    private async void ToggleStartStop()
     {
         if (IsRunning)
             Stop();
         else
-            Start();
+            await StartAsync().ConfigureAwait(false);
     }
 
     [RelayCommand]
-    private void Start()
+    private async Task StartAsync()
     {
         if (IsRunning)
         {
@@ -107,12 +107,33 @@ public partial class MainViewModel
             return;
         }
 
+        var fullPath = SelectedProfile.FullPath;
+        var engineDir = EngineDir;
+
+        await Task.Run(() =>
+        {
+            try
+            {
+                SyncCustomHostlist();
+                ProfileBatLauncher.PrepareRuntime(engineDir);
+            }
+            catch (Exception ex)
+            {
+                Application.Current?.Dispatcher.BeginInvoke(() => Logs.Add($"Ошибка подготовки: {ex.Message}"));
+            }
+        }).ConfigureAwait(true);
+
+        WinwsLaunchPlan? plan = null;
+        string? parseError = null;
+
+        await Task.Run(() =>
+        {
+            ProfileBatLauncher.TryCreateLaunchPlan(fullPath, engineDir, out plan, out parseError);
+        }).ConfigureAwait(true);
+
         try
         {
-            SyncCustomHostlist();
-            ProfileBatLauncher.PrepareRuntime(EngineDir);
-
-            if (ProfileBatLauncher.TryCreateLaunchPlan(SelectedProfile.FullPath, EngineDir, out var plan, out var parseError) && plan is not null)
+            if (plan is not null)
             {
                 StartWinwsDirect(plan);
                 return;
