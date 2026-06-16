@@ -131,7 +131,7 @@ public partial class MainViewModel : ObservableObject
         {
             Stop();
             await Task.Delay(1200).ConfigureAwait(false);
-            Application.Current.Dispatcher.BeginInvoke(async () => await StartAsync());
+            Application.Current.Dispatcher.BeginInvoke(() => Start());
         }
 
         AddToRecentLogs($"✅ Пресет «{preset.Name}» применён");
@@ -252,7 +252,7 @@ public partial class MainViewModel : ObservableObject
         if (!_suppressProfileWarning && _settingsLoaded && IsRunning && newValue is not null)
         {
             Stop();
-            _ = StartAsync();
+            Start();
         }
     }
 
@@ -793,7 +793,7 @@ public partial class MainViewModel : ObservableObject
     private void MainAction()
     {
         if (IsRunning) Stop();
-        else _ = StartAsync();
+        else Start();
     }
 
 

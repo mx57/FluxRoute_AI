@@ -197,7 +197,7 @@ public partial class MainViewModel
         void StartOnUi()
         {
             if (profile is not null)
-                _ = StartAsync();
+                Start();
         }
 
         if (dispatcher.CheckAccess())
@@ -285,7 +285,7 @@ public partial class MainViewModel
         void EnsureOnUi()
         {
             if (SelectedProfile is not null && !IsTrackedProcessRunning())
-                _ = StartAsync();
+                Start();
         }
 
         if (dispatcher.CheckAccess())
@@ -537,7 +537,7 @@ public partial class MainViewModel
                 _suppressOrchestratorStop = true;
                 Stop();
                 _suppressOrchestratorStop = false;
-                _ = StartAsync();
+                Start();
             }
         }
     }

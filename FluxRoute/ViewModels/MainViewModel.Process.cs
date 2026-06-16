@@ -81,11 +81,11 @@ public partial class MainViewModel
         if (IsRunning)
             Stop();
         else
-            _ = StartAsync();
+            Start();
     }
 
     [RelayCommand]
-    private async Task StartAsync()
+    private void Start()
     {
         if (IsRunning)
         {
@@ -107,107 +107,25 @@ public partial class MainViewModel
             return;
         }
 
-        var fullPath = SelectedProfile.FullPath;
-        var engineDir = EngineDir;
-        var displayName = SelectedProfile.DisplayName;
-        var fileName = SelectedProfile.FileName;
-
-        WinwsLaunchPlan? plan = null;
-        string? parseError = null;
-
-        await Task.Run(() =>
+        try
         {
-            try
+            SyncCustomHostlist();
+            ProfileBatLauncher.PrepareRuntime(EngineDir);
+
+            if (ProfileBatLauncher.TryCreateLaunchPlan(SelectedProfile.FullPath, EngineDir, out var plan, out var parseError) && plan is not null)
             {
-                SyncCustomHostlist();
-                ProfileBatLauncher.PrepareRuntime(engineDir);
-                ProfileBatLauncher.TryCreateLaunchPlan(fullPath, engineDir, out plan, out parseError);
+                StartWinwsDirect(plan);
+                return;
             }
-            catch { }
-        });
 
-        if (plan is not null)
-        {
-            try
-            {
-                var winws = await Task.Run(() => ProfileBatLauncher.StartWinws(plan));
-                if (winws is null)
-                {
-                    Logs.Add("Не удалось запустить winws.exe.");
-                    return;
-                }
-
-                _startedViaBatFallback = false;
-                _trackedPids = new HashSet<uint> { (uint)winws.Id };
-                _runningProcess = winws;
-                _runStartedAt = DateTimeOffset.Now;
-
-                StatusText = "Запущено";
-                CurrentStrategy = displayName;
-                RunningScriptName = fileName;
-                PidText = winws.Id.ToString();
-                IsRunning = true;
-
-                Logs.Add($"Прямой запуск winws.exe: {fileName}");
-                AddToRecentLogs($"✅ Запущен (PID: {winws.Id})");
-
-                _ = TrackDirectWinwsAsync(winws);
-                TryStartOrchestratorIfEnabled();
-
-                if (UseHybridMode)
-                    _ = StartByeDpiAsync();
-            }
-            catch (Exception ex)
-            {
-                Logs.Add($"Ошибка запуска: {ex.Message}");
-                AddToRecentLogs("❌ Ошибка запуска");
-            }
+            Logs.Add($"⚠️ Прямой запуск winws.exe недоступен: {parseError}");
+            Logs.Add("⚠️ Использую совместимый запуск через BAT/cmd.exe.");
+            StartViaBatFallback();
         }
-        else
+        catch (Exception ex)
         {
-            try
-            {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = "cmd.exe",
-                    Arguments = $"/c \"{fullPath}\"",
-                    WorkingDirectory = engineDir,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                };
-
-                var cmdProcess = await Task.Run(() => Process.Start(psi));
-                if (cmdProcess is null)
-                {
-                    Logs.Add("Не удалось запустить процесс.");
-                    return;
-                }
-
-                _startedViaBatFallback = true;
-                _runningProcess = cmdProcess;
-                _runStartedAt = DateTimeOffset.Now;
-
-                StatusText = "Запущено";
-                CurrentStrategy = displayName;
-                RunningScriptName = fileName;
-                PidText = "—";
-                IsRunning = true;
-
-                Logs.Add($"Запуск через BAT: {fileName}");
-                AddToRecentLogs($"▶ Запуск: {fileName}");
-
-                _ = TrackWinwsAsync(cmdProcess);
-                TryStartOrchestratorIfEnabled();
-
-                if (UseHybridMode)
-                    _ = StartByeDpiAsync();
-            }
-            catch (Exception ex)
-            {
-                Logs.Add($"Ошибка запуска: {ex.Message}");
-                AddToRecentLogs("❌ Ошибка запуска");
-            }
+            Logs.Add($"Ошибка запуска: {ex.Message}");
+            AddToRecentLogs("❌ Ошибка запуска");
         }
     }
 
