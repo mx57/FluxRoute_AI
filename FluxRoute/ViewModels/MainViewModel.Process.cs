@@ -76,12 +76,12 @@ public partial class MainViewModel
     }
 
     [RelayCommand]
-    private async void ToggleStartStop()
+    private void ToggleStartStop()
     {
         if (IsRunning)
             Stop();
         else
-            await StartAsync();
+            _ = StartAsync();
     }
 
     [RelayCommand]

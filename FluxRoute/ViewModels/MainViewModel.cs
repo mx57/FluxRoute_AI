@@ -790,10 +790,10 @@ public partial class MainViewModel : ObservableObject
     private void ToggleLogs() => IsLogsVisible = !IsLogsVisible;
 
     [RelayCommand]
-    private async void MainAction()
+    private void MainAction()
     {
         if (IsRunning) Stop();
-        else await StartAsync();
+        else _ = StartAsync();
     }
 
 
