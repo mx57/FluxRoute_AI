@@ -14,11 +14,4 @@ public static class WilsonScore
         var margin = z * Math.Sqrt((phat * (1 - phat) + z2 / (4 * trials)) / trials);
         return Math.Clamp((center - margin) / denom, 0, 1);
     }
-
-    public static double MeanScore(IReadOnlyList<int> scores)
-    {
-        if (scores.Count == 0)
-            return 0;
-        return scores.Average();
-    }
 }

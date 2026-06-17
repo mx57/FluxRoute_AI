@@ -104,7 +104,12 @@ public sealed class StrategyEvolver
         child.Id = Guid.NewGuid();
         child.CreatedAt = DateTimeOffset.UtcNow;
 
-        var engineTag = child.EngineType == DpiEngineType.ByeDpi ? "byedpi" : "zapret";
+        var engineTag = child.EngineType switch
+        {
+            DpiEngineType.ByeDpi => "byedpi",
+            DpiEngineType.Warp => "warp",
+            _ => "zapret",
+        };
         child.DisplayName = $"FR-ev-{child.Generation}-{engineTag}-{_rng.Next(1000, 9999)}";
         child.SourceBatPath = null;
         child.BatFileName = null;

@@ -4,7 +4,6 @@ public enum DpiEngineType
 {
     Zapret,
     ByeDpi,
-    GoodbyeDpi,
     Warp
 }
 

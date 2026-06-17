@@ -181,6 +181,8 @@ public sealed class SettingsService : ISettingsService
         return new AppSettings();
     }
 
+    private readonly object _saveLock = new();
+
     public void Save(AppSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
@@ -197,9 +199,12 @@ public sealed class SettingsService : ISettingsService
         {
             var normalized = Normalize(settings);
             var json = JsonSerializer.Serialize(normalized, JsonOptions);
-            File.WriteAllText(tempPath, json, Utf8NoBom);
 
-            ReplaceFileAtomically(tempPath, SettingsPath, BackupPath);
+            lock (_saveLock)
+            {
+                File.WriteAllText(tempPath, json, Utf8NoBom);
+                ReplaceFileAtomically(tempPath, SettingsPath, BackupPath);
+            }
         }
         catch (Exception ex)
         {

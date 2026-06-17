@@ -9,6 +9,7 @@ public sealed class AiHistoryStore
     private readonly string _path;
     private readonly object _gate = new();
     private List<ProbeOutcome>? _cache;
+    private StreamWriter? _writer;
 
     public AiHistoryStore(string path)
     {
@@ -23,7 +24,10 @@ public sealed class AiHistoryStore
             var dir = Path.GetDirectoryName(_path);
             if (!string.IsNullOrEmpty(dir))
                 Directory.CreateDirectory(dir);
-            File.AppendAllText(_path, line);
+
+            _writer ??= new StreamWriter(_path, append: true, encoding: System.Text.Encoding.UTF8) { AutoFlush = false };
+            _writer.Write(line);
+            _writer.Flush();
 
             if (_cache != null)
             {
@@ -90,17 +94,16 @@ public sealed class AiHistoryStore
             return;
 
         var cutoff = DateTimeOffset.UtcNow.AddDays(-keepDays);
-        List<ProbeOutcome> kept;
         lock (_gate)
         {
-            kept = LoadAll().Where(o => o.Timestamp >= cutoff).ToList();
-        }
+            var kept = LoadAll().Where(o => o.Timestamp >= cutoff).ToList();
 
-        lock (_gate)
-        {
             var dir = Path.GetDirectoryName(_path);
             if (!string.IsNullOrEmpty(dir))
                 Directory.CreateDirectory(dir);
+
+            _writer?.Dispose();
+            _writer = null;
 
             using var fs = File.Create(_path);
             using var sw = new StreamWriter(fs);

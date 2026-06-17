@@ -31,10 +31,3 @@ public interface IDpiEngine : IDisposable
 
     event EventHandler<EngineStatus>? StatusChanged;
 }
-
-public sealed class DpiEngineRunMode
-{
-    public const string Standalone = "standalone";
-    public const string Hybrid = "hybrid";
-    public const string Bypass = "bypass";
-}

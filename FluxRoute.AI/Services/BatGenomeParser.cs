@@ -17,6 +17,7 @@ public static class BatGenomeParser
     {
         var g = new StrategyGenome
         {
+            EngineType = FluxRoute.Core.Models.DpiEngineType.Zapret,
             DisplayName = displayName,
             Origin = origin,
             SourceBatPath = plan.SourceProfilePath,

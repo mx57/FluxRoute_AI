@@ -62,8 +62,11 @@ public sealed class AiStrategyRegistry
                 _model.Bandit ??= [];
                 _model.SeenNetworkHashes ??= [];
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Trace.TraceError($"[AiStrategyRegistry] Failed to load {_path}: {ex.Message}. Starting fresh.");
+                var backupPath = _path + $".corrupted.{DateTimeOffset.UtcNow:yyyyMMddHHmmss}.bak";
+                try { File.Copy(_path, backupPath, overwrite: true); } catch { }
                 _model = new AiStrategyPersistedModel();
             }
         }
