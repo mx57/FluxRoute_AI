@@ -10,6 +10,7 @@ public sealed class BanditStateEntry
     public string NetworkHash { get; set; } = "";
     public double Alpha { get; set; } = 1;
     public double Beta { get; set; } = 1;
+    public double AvgLatencyMs { get; set; }
 }
 
 public sealed class AiStrategyPersistedModel
@@ -166,30 +167,40 @@ public sealed class AiStrategyRegistry
         }
     }
 
-    public void RecordBanditSuccess(Guid genomeId, string networkHash)
+    public void RecordBanditSuccess(Guid genomeId, string networkHash, double latencyMs = 0)
     {
         lock (_gate)
         {
             var e = _model.Bandit.FirstOrDefault(b => b.GenomeId == genomeId && b.NetworkHash == networkHash);
             if (e is null)
             {
-                e = new BanditStateEntry { GenomeId = genomeId, NetworkHash = networkHash, Alpha = 1, Beta = 1 };
+                e = new BanditStateEntry { GenomeId = genomeId, NetworkHash = networkHash, Alpha = 1, Beta = 1, AvgLatencyMs = latencyMs };
                 _model.Bandit.Add(e);
+            }
+            else
+            {
+                var totalPulls = e.Alpha + e.Beta - 2;
+                e.AvgLatencyMs = totalPulls > 0 ? (e.AvgLatencyMs * totalPulls + latencyMs) / (totalPulls + 1) : latencyMs;
             }
 
             e.Alpha += 1;
         }
     }
 
-    public void RecordBanditFailure(Guid genomeId, string networkHash)
+    public void RecordBanditFailure(Guid genomeId, string networkHash, double latencyMs = 0)
     {
         lock (_gate)
         {
             var e = _model.Bandit.FirstOrDefault(b => b.GenomeId == genomeId && b.NetworkHash == networkHash);
             if (e is null)
             {
-                e = new BanditStateEntry { GenomeId = genomeId, NetworkHash = networkHash, Alpha = 1, Beta = 1 };
+                e = new BanditStateEntry { GenomeId = genomeId, NetworkHash = networkHash, Alpha = 1, Beta = 1, AvgLatencyMs = latencyMs };
                 _model.Bandit.Add(e);
+            }
+            else
+            {
+                var totalPulls = e.Alpha + e.Beta - 2;
+                e.AvgLatencyMs = totalPulls > 0 ? (e.AvgLatencyMs * totalPulls + latencyMs) / (totalPulls + 1) : latencyMs;
             }
 
             e.Beta += 1;

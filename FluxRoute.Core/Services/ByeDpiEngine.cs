@@ -61,6 +61,8 @@ public sealed class ByeDpiEngine : IDpiEngine
                 psi.ArgumentList.Add(arg);
 
             var process = new Process { StartInfo = psi };
+            process.OutputDataReceived += (_, _) => { };
+            process.ErrorDataReceived += (_, _) => { };
             process.Exited += (_, _) =>
             {
                 lock (_gate)
@@ -85,6 +87,9 @@ public sealed class ByeDpiEngine : IDpiEngine
                 return false;
             }
 
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
             lock (_gate)
             {
                 _process = process;
@@ -96,8 +101,9 @@ public sealed class ByeDpiEngine : IDpiEngine
             NotifyStatus();
             return true;
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Trace.TraceError($"[ByeDpiEngine] StartAsync failed: {ex}");
             lock (_gate)
             {
                 Status = EngineStatus.Failed;
@@ -278,10 +284,14 @@ public sealed class ByeDpiEngine : IDpiEngine
             if (!process.HasExited)
                 process.Kill(entireProcessTree: true);
             process.WaitForExit(2000);
-            process.Dispose();
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Trace.TraceError($"[ByeDpiEngine] TryKillProcess failed: {ex}");
+        }
+        finally
+        {
+            process.Dispose();
         }
     }
 
@@ -289,6 +299,6 @@ public sealed class ByeDpiEngine : IDpiEngine
     {
         if (_disposed) return;
         _disposed = true;
-        StopAsync().GetAwaiter().GetResult();
+        StopAsync();
     }
 }

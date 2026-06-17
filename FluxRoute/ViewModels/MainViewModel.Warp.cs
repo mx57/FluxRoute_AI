@@ -15,7 +15,8 @@ public partial class MainViewModel
         WarpConfigResult = "Генерация...";
         try
         {
-            var service = new WarpService(new HttpClient());
+            using var http = new HttpClient();
+            var service = new WarpService(http);
             var config = await service.RegisterAsync();
             WarpConfigResult = service.GenerateWireGuardConfig(config);
             Logs.Add("[Warp] Конфигурация успешно сгенерирована.");

@@ -193,9 +193,11 @@ public sealed class BatMaterializer
         foreach (var c in arg)
         {
             if (c == '"')
-                sb.Append("\\\"");
+                sb.Append("\"\"");
             else if (c == '%')
                 sb.Append("%%");
+            else if (c == '^')
+                sb.Append("^^");
             else
                 sb.Append(c);
         }

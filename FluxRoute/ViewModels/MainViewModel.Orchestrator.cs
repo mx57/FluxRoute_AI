@@ -685,20 +685,18 @@ public partial class MainViewModel
         {
             if (matched is not null)
             {
-                // Процесс появился → применяем пресет
                 _activeTriggeredPreset = matchedId;
                 AddOrchestratorLog($"[{DateTime.Now:HH:mm:ss}] 🎮 Обнаружен процесс «{matched.TriggerProcess}» → применяю пресет «{matched.Name}»");
-                _ = ApplyPreset(matched);
+                _ = SafeFireAndForget(ApplyPreset(matched));
             }
             else if (_activeTriggeredPreset is not null)
             {
-                // Процесс исчез → возвращаем первый пресет без триггера (если есть)
                 _activeTriggeredPreset = null;
                 var fallback = Presets.FirstOrDefault(p => string.IsNullOrWhiteSpace(p.TriggerProcess));
                 if (fallback is not null)
                 {
                     AddOrchestratorLog($"[{DateTime.Now:HH:mm:ss}] ↩ Процесс завершён → возврат к пресету «{fallback.Name}»");
-                    _ = ApplyPreset(fallback);
+                    _ = SafeFireAndForget(ApplyPreset(fallback));
                 }
                 else
                 {
@@ -706,5 +704,11 @@ public partial class MainViewModel
                 }
             }
         }
+    }
+
+    private static async Task SafeFireAndForget(Task task)
+    {
+        try { await task.ConfigureAwait(false); }
+        catch (Exception ex) { System.Diagnostics.Trace.TraceError($"[Orchestrator] Fire-and-forget failed: {ex}"); }
     }
 }

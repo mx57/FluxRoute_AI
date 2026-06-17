@@ -21,8 +21,8 @@ public sealed class DpiEngineManager : IDisposable
     private readonly ConcurrentDictionary<DpiEngineType, IDpiEngine> _engines = new();
     private readonly ConcurrentDictionary<DpiEngineType, EngineProfile> _activeProfiles = new();
     private readonly object _gate = new();
-    private string _runMode = DpiRunMode.Standalone;
-    private bool _disposed;
+    private volatile string _runMode = DpiRunMode.Standalone;
+    private volatile bool _disposed;
 
     public IReadOnlyCollection<IDpiEngine> Engines => _engines.Values.ToList();
     public string RunMode => _runMode;
@@ -222,6 +222,9 @@ public sealed class DpiEngineManager : IDisposable
         PsiphonCountry = p.PsiphonCountry,
         ScanEnabled = p.ScanEnabled,
         Reserved = p.Reserved,
+        DesyncAnyProtocol = p.DesyncAnyProtocol,
+        DesyncFooling = p.DesyncFooling,
+        FakeResend = p.FakeResend,
     };
 
     public EngineProfile CloneWithDefaults(DpiEngineType type)

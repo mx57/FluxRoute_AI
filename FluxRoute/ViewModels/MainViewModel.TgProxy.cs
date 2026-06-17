@@ -275,7 +275,7 @@ public partial class MainViewModel
             using var noRedirect = new HttpClientHandler { AllowAutoRedirect = false };
             using var verHttp = new HttpClient(noRedirect);
             verHttp.DefaultRequestHeaders.Add("User-Agent", "FluxRoute");
-            var verResp = await verHttp.GetAsync("https://github.com/Flowseal/tg-ws-proxy/releases/latest");
+            using var verResp = await verHttp.GetAsync("https://github.com/Flowseal/tg-ws-proxy/releases/latest");
             var tagName = verResp.Headers.Location?.ToString().Split('/').LastOrDefault() ?? "unknown";
 
             foreach (var file in ProxySourceFiles)

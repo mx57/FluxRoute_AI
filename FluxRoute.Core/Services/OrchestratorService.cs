@@ -65,7 +65,16 @@ public sealed class OrchestratorService : IDisposable
             return;
         }
 
-        Task.Run(() => LoopAsync(newCts.Token));
+        _ = Task.Run(async () =>
+        {
+            try { await LoopAsync(newCts.Token).ConfigureAwait(false); }
+            catch (OperationCanceledException) { }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError($"[Orchestrator] LoopAsync crashed: {ex}");
+                Notify($"❌ Оркестратор остановлен из-за ошибки: {ex.Message}");
+            }
+        });
         Notify("Оркестратор запущен.");
     }
 
@@ -362,13 +371,20 @@ public sealed class OrchestratorService : IDisposable
 
     private void Notify(string msg, bool switched = false, string? newProfile = null, ProfileProbeResult? result = null)
     {
-        StatusChanged?.Invoke(this, new OrchestratorEventArgs
+        try
         {
-            Message = $"[{DateTime.Now:HH:mm:ss}] {msg}",
-            IsSwitched = switched,
-            NewProfile = newProfile,
-            ProbeResult = result
-        });
+            StatusChanged?.Invoke(this, new OrchestratorEventArgs
+            {
+                Message = $"[{DateTime.Now:HH:mm:ss}] {msg}",
+                IsSwitched = switched,
+                NewProfile = newProfile,
+                ProbeResult = result
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceError($"[Orchestrator] Notify subscriber threw: {ex}");
+        }
     }
 
     public void Dispose() => Stop();

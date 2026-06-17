@@ -560,18 +560,22 @@ public partial class MainViewModel
                 }
             };
             p.Start();
+            p.BeginOutputReadLine();
+            p.BeginErrorReadLine();
 
-            var outputTask = p.StandardOutput.ReadToEndAsync();
-            var errorTask = p.StandardError.ReadToEndAsync();
+            var outputBuilder = new System.Text.StringBuilder();
+            var errorBuilder = new System.Text.StringBuilder();
+            p.OutputDataReceived += (_, e) => { if (e.Data != null) outputBuilder.AppendLine(e.Data); };
+            p.ErrorDataReceived += (_, e) => { if (e.Data != null) errorBuilder.AppendLine(e.Data); };
 
             if (!p.WaitForExit(timeoutMs))
             {
                 try { p.Kill(entireProcessTree: true); } catch { }
-                return "";
+                p.WaitForExit(2000);
             }
 
-            var output = outputTask.Result;
-            var error = errorTask.Result;
+            var output = outputBuilder.ToString();
+            var error = errorBuilder.ToString();
 
             if (string.IsNullOrWhiteSpace(output) && !string.IsNullOrWhiteSpace(error))
                 return $"[STDERR] {error.Trim()}";

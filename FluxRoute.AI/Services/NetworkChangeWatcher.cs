@@ -48,8 +48,9 @@ public sealed class NetworkChangeWatcher : IDisposable
                     if (oldSnap is not null)
                         NetworkChanged?.Invoke(this, (oldSnap, next));
                 }
-                catch
+                catch (Exception ex)
                 {
+                    System.Diagnostics.Trace.TraceError($"[NetworkChangeWatcher] ScheduleEmit failed: {ex}");
                 }
             }, null, _debounce, Timeout.InfiniteTimeSpan);
         }

@@ -48,13 +48,17 @@ public static class StrategyGenomeValidator
 
     public static void Normalize(StrategyGenome g)
     {
-        if (g.EngineType == DpiEngineType.ByeDpi)
+        switch (g.EngineType)
         {
-            NormalizeByeDpi(g);
-            return;
+            case DpiEngineType.ByeDpi:
+                NormalizeByeDpi(g);
+                break;
+            case DpiEngineType.Warp:
+                break;
+            default:
+                NormalizeZapret(g);
+                break;
         }
-
-        NormalizeZapret(g);
     }
 
     private static void NormalizeZapret(StrategyGenome g)

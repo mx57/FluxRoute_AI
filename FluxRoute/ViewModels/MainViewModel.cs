@@ -131,7 +131,8 @@ public partial class MainViewModel : ObservableObject
         {
             Stop();
             await Task.Delay(1200).ConfigureAwait(false);
-            Application.Current.Dispatcher.BeginInvoke(() => Start());
+            if (Application.Current is { } app && !app.Dispatcher.HasShutdownStarted)
+                app.Dispatcher.BeginInvoke(() => Start());
         }
 
         AddToRecentLogs($"✅ Пресет «{preset.Name}» применён");
@@ -805,7 +806,6 @@ public partial class MainViewModel : ObservableObject
         LastStatusMessage = message;
     }
 
-    // ── Синхронизация пользовательских доменов с движком (winws.exe) ──
     // ── Синхронизация пользовательских доменов с движком (winws.exe) ──
     private void SyncCustomHostlist()
     {

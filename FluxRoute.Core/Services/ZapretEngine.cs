@@ -63,6 +63,8 @@ public sealed class ZapretEngine : IDpiEngine
                 psi.ArgumentList.Add(arg);
 
             var process = new Process { StartInfo = psi };
+            process.OutputDataReceived += (_, _) => { };
+            process.ErrorDataReceived += (_, _) => { };
             process.Exited += (_, _) =>
             {
                 lock (_gate)
@@ -87,6 +89,9 @@ public sealed class ZapretEngine : IDpiEngine
                 return false;
             }
 
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
             lock (_gate)
             {
                 _process = process;
@@ -98,8 +103,9 @@ public sealed class ZapretEngine : IDpiEngine
             NotifyStatus();
             return true;
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Trace.TraceError($"[ZapretEngine] StartAsync failed: {ex}");
             lock (_gate)
             {
                 Status = EngineStatus.Failed;
@@ -220,10 +226,14 @@ public sealed class ZapretEngine : IDpiEngine
             if (!process.HasExited)
                 process.Kill(entireProcessTree: true);
             process.WaitForExit(2000);
-            process.Dispose();
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Trace.TraceError($"[ZapretEngine] TryKillProcess failed: {ex}");
+        }
+        finally
+        {
+            process.Dispose();
         }
     }
 
@@ -231,6 +241,6 @@ public sealed class ZapretEngine : IDpiEngine
     {
         if (_disposed) return;
         _disposed = true;
-        StopAsync().GetAwaiter().GetResult();
+        StopAsync();
     }
 }

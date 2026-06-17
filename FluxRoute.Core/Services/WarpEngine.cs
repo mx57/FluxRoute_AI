@@ -60,6 +60,8 @@ public sealed class WarpEngine : IDpiEngine
                 psi.ArgumentList.Add(arg);
 
             var process = new Process { StartInfo = psi };
+            process.OutputDataReceived += (_, _) => { };
+            process.ErrorDataReceived += (_, _) => { };
             process.Exited += (_, _) =>
             {
                 lock (_gate)
@@ -84,19 +86,23 @@ public sealed class WarpEngine : IDpiEngine
                 return false;
             }
 
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
             lock (_gate)
             {
                 _process = process;
                 ProcessInfo = new EngineProcessInfo(
                     process.Id, "warp-plus.exe", EngineStatus.Running,
-                    DateTimeOffset.Now, 8086); // warp-plus default bind port
+                    DateTimeOffset.Now, 8086);
                 Status = EngineStatus.Running;
             }
             NotifyStatus();
             return true;
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Trace.TraceError($"[WarpEngine] StartAsync failed: {ex}");
             lock (_gate)
             {
                 Status = EngineStatus.Failed;
@@ -148,9 +154,8 @@ public sealed class WarpEngine : IDpiEngine
     {
         var list = new List<string>();
 
-        // Basic flags for warp-plus
         list.Add("-b");
-        list.Add("127.0.0.1:8086"); // Default bind for internal proxy use
+        list.Add("127.0.0.1:8086");
 
         if (!string.IsNullOrWhiteSpace(p.WarpConfig))
         {
@@ -212,10 +217,14 @@ public sealed class WarpEngine : IDpiEngine
             if (!process.HasExited)
                 process.Kill(entireProcessTree: true);
             process.WaitForExit(2000);
-            process.Dispose();
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Trace.TraceError($"[WarpEngine] TryKillProcess failed: {ex}");
+        }
+        finally
+        {
+            process.Dispose();
         }
     }
 
@@ -223,6 +232,6 @@ public sealed class WarpEngine : IDpiEngine
     {
         if (_disposed) return;
         _disposed = true;
-        StopAsync().GetAwaiter().GetResult();
+        StopAsync();
     }
 }

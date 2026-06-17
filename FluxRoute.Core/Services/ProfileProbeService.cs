@@ -152,7 +152,7 @@ public sealed class ProfileProbeService
         });
 
         var results = (await Task.WhenAll(tasks).ConfigureAwait(false)).ToList();
-        var rate = results.Count(r => r.Ok) / (double)results.Count;
+        var rate = results.Count > 0 ? results.Count(r => r.Ok) / (double)results.Count : 0.0;
         return (rate, results);
     }
 

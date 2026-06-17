@@ -266,7 +266,7 @@ public sealed partial class ServiceViewModel : ObservableObject
             Directory.CreateDirectory(listsDir);
             await File.WriteAllTextAsync(IpSetFilePath, content);
 
-            Application.Current.Dispatcher.Invoke(() =>
+            DispatchToUI(() =>
             {
                 AddLog($"✅ IPSet обновлён ({content.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length} записей)");
                 Refresh();
@@ -274,14 +274,11 @@ public sealed partial class ServiceViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                AddLog($"❌ Ошибка скачивания IPSet: {ex.Message}");
-            });
+            DispatchToUI(() => AddLog($"❌ Ошибка скачивания IPSet: {ex.Message}"));
         }
         finally
         {
-            Application.Current.Dispatcher.Invoke(() => IsServiceBusy = false);
+            DispatchToUI(() => IsServiceBusy = false);
         }
     }
 
@@ -303,7 +300,7 @@ public sealed partial class ServiceViewModel : ObservableObject
 
             if (!File.Exists(hostsPath))
             {
-                Application.Current.Dispatcher.Invoke(() => AddLog("❌ Файл hosts не найден"));
+                DispatchToUI(() => AddLog("❌ Файл hosts не найден"));
                 return;
             }
 
@@ -313,39 +310,49 @@ public sealed partial class ServiceViewModel : ObservableObject
 
             if (currentHosts.Contains(firstLine) && currentHosts.Contains(lastLine))
             {
-                Application.Current.Dispatcher.Invoke(() => AddLog("✅ Hosts файл актуален"));
+                DispatchToUI(() => AddLog("✅ Hosts файл актуален"));
                 return;
             }
 
             var tempPath = Path.GetTempFileName();
-            await File.WriteAllTextAsync(tempPath, currentHosts + "\n" + newContent);
-
-            Process.Start(new ProcessStartInfo
+            try
             {
-                FileName = "cmd.exe",
-                Arguments = $"/c copy /Y \"{tempPath}\" \"{hostsPath}\"",
-                UseShellExecute = true,
-                Verb = "runas",
-                CreateNoWindow = true
-            });
+                await File.WriteAllTextAsync(tempPath, currentHosts + "\n" + newContent);
 
-            Application.Current.Dispatcher.Invoke(() =>
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = $"/c copy /Y \"{tempPath}\" \"{hostsPath}\"",
+                    UseShellExecute = true,
+                    Verb = "runas",
+                    CreateNoWindow = true
+                });
+
+                DispatchToUI(() =>
+                {
+                    AddLog($"✅ Hosts обновлён ({newLines.Length} записей добавлено)");
+                    Refresh();
+                });
+            }
+            finally
             {
-                AddLog($"✅ Hosts обновлён ({newLines.Length} записей добавлено)");
-                Refresh();
-            });
+                try { File.Delete(tempPath); } catch { }
+            }
         }
         catch (Exception ex)
         {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                AddLog($"❌ Ошибка обновления hosts: {ex.Message}");
-            });
+            DispatchToUI(() => AddLog($"❌ Ошибка обновления hosts: {ex.Message}"));
         }
         finally
         {
-            Application.Current.Dispatcher.Invoke(() => IsServiceBusy = false);
+            DispatchToUI(() => IsServiceBusy = false);
         }
+    }
+
+    private static void DispatchToUI(Action action)
+    {
+        if (Application.Current is { } app && !app.Dispatcher.HasShutdownStarted)
+            app.Dispatcher.Invoke(action);
     }
 
     [RelayCommand]
@@ -410,8 +417,7 @@ public sealed partial class ServiceViewModel : ObservableObject
             });
 
             AddLog("✅ Команды остановки отправлены");
-            _ = Task.Delay(3000).ContinueWith(_ =>
-                Application.Current.Dispatcher.Invoke(Refresh));
+            _ = Task.Delay(3000).ContinueWith(_ => DispatchToUI(Refresh));
         }
         catch (Exception ex)
         {

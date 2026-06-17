@@ -118,7 +118,7 @@ public sealed class BanditSelector
                 var pulls = entry.Alpha + entry.Beta - 2;
                 if (pulls < 1) return (g, score: 0.5, latency: 1000.0);
                 var score = entry.Alpha / (entry.Alpha + entry.Beta);
-                var latency = entry.Alpha > 0 ? entry.Alpha / (entry.Alpha + entry.Beta) * 100 : 500;
+                var latency = entry.AvgLatencyMs > 0 ? entry.AvgLatencyMs : (1.0 - score) * 500;
                 return (g, score, latency);
             })
             .ToList();

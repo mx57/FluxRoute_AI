@@ -10,16 +10,7 @@ namespace FluxRoute.ViewModels;
 // Вся бизнес-логика вынесена в ServiceViewModel.cs.
 public partial class MainViewModel
 {
-    private void AddServiceLog(string message) => Service.ServiceLogs.Add($"[{DateTime.Now:HH:mm:ss}] {message}");
-
     private void RefreshServiceStatus() => Service.Refresh();
-
-    private string ProtocolToFileValue(string protocol) => protocol switch
-    {
-        "TCP и UDP" => "all",
-        "TCP" => "tcp",
-        _ => "udp"
-    };
 
     [RelayCommand]
     private void ToggleGameFilter() => Service.ToggleGameFilterCommand.Execute(null);

@@ -70,9 +70,9 @@ public class WarpService
                 Reserved = "AAAA" // Default reserved bytes
             };
         }
-        catch
+        catch (Exception ex)
         {
-            // Fallback to simulation if API fails or for offline mode
+            System.Diagnostics.Trace.TraceError($"[WarpService] RegisterAsync API call failed: {ex.Message}");
             return new WarpConfig
             {
                 PrivateKey = privateKey,
@@ -94,9 +94,20 @@ public class WarpService
 
     private string DerivePublicKey(string privateKey)
     {
-        // Simplified: in real app, use X25519 to derive public key
-        // For now, we'll return a dummy public key or the same string for placeholder
-        return privateKey;
+        var privateKeyBytes = Convert.FromBase64String(privateKey);
+        using var ecdsa = ECDsa.Create(new ECParameters
+        {
+            Curve = ECCurve.NamedCurves.nistP256,
+            D = privateKeyBytes,
+        });
+        var publicPoint = ecdsa.ExportParameters(false).Q;
+        var x = publicPoint.X;
+        var y = publicPoint.Y;
+        var combined = new byte[1 + x.Length + y.Length];
+        combined[0] = 0x04;
+        Buffer.BlockCopy(x, 0, combined, 1, x.Length);
+        Buffer.BlockCopy(y, 0, combined, 1 + x.Length, y.Length);
+        return Convert.ToBase64String(combined);
     }
 
     public string GenerateWireGuardConfig(WarpConfig config)

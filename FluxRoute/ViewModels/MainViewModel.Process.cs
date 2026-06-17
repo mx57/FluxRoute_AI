@@ -313,7 +313,10 @@ public partial class MainViewModel
                 {
                     try
                     {
-                        winws = Process.GetProcessesByName("winws").FirstOrDefault();
+                        var candidates = Process.GetProcessesByName("winws");
+                        winws = candidates.FirstOrDefault();
+                        foreach (var c in candidates.Skip(1))
+                            c.Dispose();
                     }
                     catch
                     {
@@ -498,10 +501,6 @@ public partial class MainViewModel
         }
 
         return pids;
-    }
-
-    private void InstallWindowHook()
-    {
     }
 
     private void RemoveWindowHook()
