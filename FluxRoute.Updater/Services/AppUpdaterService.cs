@@ -31,14 +31,14 @@ public sealed class AppUpdaterService : IAppUpdaterService
 {
     // Atom-лента релизов — не является GitHub API, лимитов нет
     private const string ReleasesAtomUrl =
-        "https://github.com/klondike0x/FluxRoute/releases.atom";
+        "https://github.com/mx57/FluxRoute_AI/releases.atom";
 
-    // Имя asset в релизе: FluxRoute-v1.4.1-portable.zip
-    private const string AssetNameTemplate = "FluxRoute-{0}-portable.zip";
+    // Имя asset в релизе: FluxRoute_AI-v1.6.0-portable.zip
+    private const string AssetNameTemplate = "FluxRoute_AI-{0}-portable.zip";
 
     // Прямой URL скачивания (не API, CDN GitHub — лимитов нет)
     private const string DownloadUrlTemplate =
-        "https://github.com/klondike0x/FluxRoute/releases/download/{0}/FluxRoute-{0}-portable.zip";
+        "https://github.com/mx57/FluxRoute_AI/releases/download/{0}/FluxRoute_AI-{0}-portable.zip";
 
     private const string UserAgent = "FluxRoute-AppUpdater";
 

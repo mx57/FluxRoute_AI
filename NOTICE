@@ -1,0 +1,48 @@
+FluxRoute AI
+Copyright (C) 2026 mx57
+
+This software is licensed under the GNU General Public License v3.0 (GPLv3).
+See LICENSE file for the full license text.
+
+This project is a fork of FluxRoute Desktop by klondike0x, with additional
+AI extensions (Thompson Sampling, genetic strategy evolution).
+
+Original project: https://github.com/klondike0x/FluxRoute
+Fork author: https://github.com/mx57
+
+==========================================================================
+Third-party components and their licenses
+==========================================================================
+
+1. zapret by bol-van
+   https://github.com/bol-van/zapret
+   License: MIT
+
+2. zapret-win-bundle by bol-van
+   https://github.com/bol-van/zapret-win-bundle
+   License: MIT
+
+3. zapret-discord-youtube by Flowseal
+   https://github.com/Flowseal/zapret-discord-youtube
+   License: MIT
+
+4. tg-ws-proxy by Flowseal
+   https://github.com/Flowseal/tg-ws-proxy
+   License: MIT
+
+5. WinDivert by basil00
+   https://github.com/basil00/WinDivert
+   License: LGPL v3
+
+==========================================================================
+NuGet package licenses (all GPL-compatible)
+==========================================================================
+
+- CommunityToolkit.Mvvm: MIT
+- LiveChartsCore.SkiaSharpView.WPF: MIT
+- Microsoft.Extensions.*: MIT
+- Serilog: Apache 2.0
+- Serilog.Extensions.Hosting: Apache 2.0
+- Serilog.Sinks.File: Apache 2.0
+- xUnit: Apache 2.0
+- coverlet.collector: MIT

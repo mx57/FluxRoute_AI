@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using FluxRoute.AI.Services;
 using FluxRoute.Core.Models;
 using FluxRoute.Core.Services;
+using FluxRoute.Core.Services.ChainBuilder;
 using FluxRoute.Services;
 using FluxRoute.Updater.Services;
 using FluxRoute.Views;
@@ -39,6 +40,8 @@ public partial class MainViewModel : ObservableObject
     // ── Менеджер доменов ──
     [ObservableProperty] private string selectedTabMode = "Domains";
     [ObservableProperty] private string newSiteInput = "";
+
+    public ChainBuilderViewModel ChainBuilder { get; private set; } = null!;
 
     public ObservableCollection<string> CustomTargetDomains { get; } = new();
     public ObservableCollection<string> CustomExcludeDomains { get; } = new();
@@ -456,7 +459,8 @@ public partial class MainViewModel : ObservableObject
         AiHistoryStore aiHistoryStore,
         BanditSelector aiBandit,
         StrategyEvolver aiEvolver,
-        BatMaterializer aiMaterializer)
+        BatMaterializer aiMaterializer,
+        ChainStore chainStore)
     {
         _settingsService = settingsService;
         _updater = updaterService;
@@ -470,6 +474,8 @@ public partial class MainViewModel : ObservableObject
         _aiFingerprints = aiFingerprints;
 
         // ── Инициализация feature ViewModels ──
+        ChainBuilder = new ChainBuilderViewModel(chainStore);
+
         Diagnostics = new DiagnosticsViewModel(
             getEngineDir: () => EngineDir,
             getWinwsPath: () => WinwsPath,

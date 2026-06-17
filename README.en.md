@@ -212,6 +212,18 @@ This project uses the **WinDivert** driver for packet modification.
 
 ---
 
+## ⚖️ Disclaimer
+
+**FluxRoute AI** is educational and research software designed for studying network technologies, analyzing traffic filtering mechanisms, and experimenting with adaptive routing methods.
+
+This software **is not** a tool for violating applicable laws in any jurisdiction. The author assumes no responsibility for any use of this program that contradicts applicable legislation.
+
+The user bears sole responsibility for the lawful use of this software in their country. Please familiarize yourself with local regulations before use.
+
+This project is distributed under the **GPLv3** license and is intended exclusively for lawful research and educational purposes.
+
+---
+
 ## 🙏 Acknowledgments
 
 - **[klondike0x/FluxRoute](https://github.com/klondike0x/FluxRoute)** — base architecture
