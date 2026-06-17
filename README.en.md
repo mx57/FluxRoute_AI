@@ -6,21 +6,21 @@
   <img width="650" alt="FluxRoute AI Logo" src="./assets/FluxRoute-dark.svg" />
 </picture>
 
-# FluxRoute AI `v1.6.2`
+# FluxRoute AI `v1.7.1`
 
-### ⚡ Intelligent Swiss Army Knife for DPI Bypass on Windows
+### ⚡ Self-Learning DPI Bypass for Windows
 
-**A self-learning system that unifies Zapret, ByeDPI, and Cloudflare Warp into a single adaptive mechanism.**
+**Unifies Zapret, ByeDPI, and Cloudflare Warp into a single adaptive system with an AI orchestrator.**
 
-[🇷🇺 Русская версия](README.md) | [📥 Download Release](https://github.com/mx57/FluxRoute_AI/releases) | [🐛 Report an Issue](https://github.com/mx57/FluxRoute_AI/issues)
+[🇷🇺 Русский](README.md) | [📥 Download](https://github.com/mx57/FluxRoute_AI/releases) | [🐛 Report Issue](https://github.com/mx57/FluxRoute_AI/issues)
 
 ---
 
 [![Stars](https://img.shields.io/github/stars/mx57/FluxRoute_AI?style=for-the-badge&logo=github&color=FFD700)](https://github.com/mx57/FluxRoute_AI)
 [![Releases](https://img.shields.io/github/v/release/mx57/FluxRoute_AI?include_prereleases&sort=semver&logo=github&label=version&style=for-the-badge&color=3FB950)](https://github.com/mx57/FluxRoute_AI/releases)
 [![Downloads](https://img.shields.io/github/downloads/mx57/FluxRoute_AI/total?logo=github&label=downloads&style=for-the-badge&color=4FC3F7)](https://github.com/mx57/FluxRoute_AI/releases)
-[![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&style=for-the-badge)](https://dotnet.microsoft.com/)
-[![License](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](./LICENSE)
+[![.NET 10](https://img.shields.io/badge/.NET_10-512BD4?logo=dotnet&style=for-the-badge)](https://dotnet.microsoft.com/)
+[![License](https://img.shields.io/badge/GPLv3-blue.svg?style=for-the-badge)](./LICENSE)
 
 </div>
 
@@ -28,13 +28,9 @@
 
 ## 🌟 Why FluxRoute AI?
 
-Typical GUIs for DPI tools just launch processes. **FluxRoute AI** goes further — it **thinks**. Censorship and DPI filters change constantly, and what worked yesterday might fail today. Our system uses mathematical models to automatically adapt to your specific ISP and network.
+Typical GUIs for DPI tools just launch processes. **FluxRoute AI** **thinks**. Censorship and DPI filters change constantly — what worked yesterday may fail today. Our system uses mathematical models to automatically adapt to your specific ISP and network.
 
-### 🧠 Artificial Intelligence (Thompson Sampling)
-Instead of manually guessing which profile to use, the AI Orchestrator analyzes the success of every connection attempt. It balances between using the current "Gold Standard" strategy and exploring new, potentially more effective parameter combinations.
-
-### 🧬 Genetic Evolution
-The system literally "grows" new BAT profiles. it crosses parameters of the most successful strategies, applies random mutations (desync, split, fake-tls), and verifies the results. Only the fittest configurations survive.
+> **This fork is the parent of all AI features that made it into the original FluxRoute release.**
 
 ---
 
@@ -42,72 +38,194 @@ The system literally "grows" new BAT profiles. it crosses parameters of the most
 
 | Category | Features |
 | :--- | :--- |
-| **Engine Support** | Zapret (`winws.exe`), ByeDPI (`ciadpi.exe`), Cloudflare Warp (`warp-plus.exe`). |
-| **Operating Modes** | **Standalone** (single engine), **Hybrid** (smart Zapret/ByeDPI toggle), **Parallel** (multiple engines), **Chained** (SOCKS5 tunnel chain). |
-| **Intelligence** | Thompson Sampling, Wilson Lower Bound (confidence intervals), Fast Start (instant warm-up of TOP strategies). |
-| **Networking** | Per-network AI policy (Network Fingerprinting), Auto-MTU discovery for Warp. |
-| **Automation** | Full lifecycle: from Warp account registration to automated binary updates from GitHub. |
+| **🔧 Engines** | Zapret (`winws.exe`), ByeDPI (`ciadpi.exe`), Cloudflare Warp (`warp-plus.exe`) |
+| **⚡ Modes** | Standalone · Hybrid · Warp · Warp+Zapret · Warp+ByeDPI · Chained (×2) · Bypass |
+| **🧠 AI** | Thompson Sampling · Genetic Evolution · Wilson Score · Fast Start · Auto-MTU |
+| **🌐 Network** | Network Fingerprinting (per-network policy) · Auto-switch on network change |
+| **🤖 Automation** | Auto Warp registration · Background monitoring · Auto-update from GitHub |
+| **✈️ TG WS Proxy** | Telegram WebSocket proxy with auto-install and Cloudflare support |
+| **🎮 Service** | Game Filter · IPSet · Auto-Tune · Zapret Windows Service management |
+| **🔄 Updates** | 5 independent channels: engine, app, ByeDPI, Warp, TG Proxy |
+| **📋 Domains** | Domain manager (targets + exclusions) · Sync with winws.exe |
+| **⚙️ Presets** | Save configurations · Auto-switch by running process |
+| **📊 Diagnostics** | Component checks · Diagnostic bundle export · Unified log viewer |
 
 ---
 
-## 🚀 New in v1.6.2
+## 🧠 Artificial Intelligence
 
-> [!IMPORTANT]
-> This is a major update focused on the synergy between traditional DPI tools and modern VPN technologies.
+### Thompson Sampling (Multi-Armed Bandits)
 
-- **🌐 Cloudflare Warp (WireGuard/AmneziaWG):** Native integration. Use Warp as standalone protection or as a "tunnel-in-a-tunnel" for Zapret.
-- **⚡ Chaining Mode:** Run Zapret/ByeDPI with traffic routed through Warp. This bypasses filters based on both packet signatures and IP address lists.
-- **🎯 Wilson Score 2.0:** Refined ranking logic. The AI now more accurately weighs strategy reliability using a 14-day rolling history.
-- **🧪 Deep Mutations:** Genetic evolution now explores `DesyncAnyProtocol`, `DesyncFooling`, and `FakeResend` parameters.
+The AI orchestrator analyzes strategy success rates and uses **Beta distributions** to balance:
+- **Exploitation** — using the best proven strategy
+- **Exploration** — periodically testing new strategies that may work better
+
+Configurable `ExplorationRate` (‰) controls the balance.
+
+### 🧬 Genetic Evolution
+
+The system "grows" new BAT profiles:
+1. **Crossover** of two best strategies' parameters
+2. **Mutation** of 15 parameter types (split, desync, fake-TTL, fake-TLS, fooling, MTU, etc.)
+3. **Validation** and **deduplication** via `GenomeSignature`
+4. **Survival** of the fittest — weak strategies are auto-deleted
+
+### Network Fingerprinting
+
+- Data collected: network interface type, IPs, gateway, DNS servers, subnet prefixes
+- SHA-256 hash for network identification
+- **Per-network AI policy** — works differently on home Wi-Fi vs mobile internet
+
+### Fast Start
+
+On launch or network change, instantly probes the **top 3 strategies** for quick selection.
+
+### Wilson Score
+
+Strategies ranked by **Wilson lower bound** (95% confidence interval) — statistically rigorous quality estimation.
 
 ---
 
-## 📸 UI Gallery
+## ⚡ Operating Modes
 
-<div align="center">
-  <table border="0">
-    <tr>
-      <td><img src="https://github.com/user-attachments/assets/70dda58d-cbf3-43f8-b8ae-72b7fad3d88e" width="400" alt="Main UI" /><br/><p align="center"><i>Main Control Screen</i></p></td>
-      <td><img src="https://github.com/user-attachments/assets/bf33cffb-6d56-4055-8f8e-8c807f57d9a7" width="400" alt="AI Stats" /><br/><p align="center"><i>AI Statistics & Evolution</i></p></td>
-    </tr>
-  </table>
-</div>
-
----
-
-## ⚙️ Mode Comparison
-
-| Mode | Best For | ISP Evasion Difficulty |
+| Mode | Description | ISP Evasion Difficulty |
 | :--- | :--- | :--- |
-| **Zapret** | YouTube, Discord, basic bypass. | Low (easily fingerprinted) |
-| **Warp** | IP-based blocks (Instagram, Twitter). | Medium (blocked by port/protocol) |
-| **Hybrid** | When ISP blocks change protocols randomly. | High |
-| **Chained** | Maximum penetration (DPI Bypass + VPN). | **Maximum** |
+| **Zapret** | Primary DPI-bypass engine | Low |
+| **ByeDPI** | Alternative DPI-bypass engine | Low |
+| **Warp** | Cloudflare WireGuard VPN | Medium |
+| **Hybrid** | Zapret + ByeDPI parallel, smart switching | High |
+| **Warp+Zapret** | Warp + Zapret parallel | High |
+| **Warp+ByeDPI** | Warp + ByeDPI parallel | High |
+| **Warp→Zapret Chained** | Zapret tunneled through Warp SOCKS5 | **Maximum** |
+| **Warp→ByeDPI Chained** | ByeDPI tunneled through Warp SOCKS5 | **Maximum** |
+| **Bypass** | No protection, pass-through | — |
 
 ---
 
-## 📅 Roadmap (Future)
+## ✈️ TG WS Proxy
 
-- [ ] **Sing-Box Integration:** Support for VLESS, Reality, and other cutting-edge protocols.
-- [ ] **P2P Genome Sharing:** Optionally share successful "mutations" with the community anonymously.
-- [ ] **Traffic Visualization:** Real-time throughput and bypass efficiency graphs.
+Built-in Telegram WebSocket proxy for bypassing Telegram blocks:
+
+- **Auto-install** — downloads Python Embeddable, pip, cryptography, and proxy source files
+- **Cloudflare Proxy** — traffic proxying via Cloudflare
+- **DC Mapping** — Telegram DC IP address configuration
+- **Deep Link** — open proxy in Telegram with one button
+- **Auto-start** on app launch
 
 ---
 
-## ⚠️ Security & WinDivert
+## 🎮 Service & Settings
 
-This project uses the **WinDivert** driver to modify network packets on-the-fly.
-- This is **not a virus**. It is a system administration tool.
-- Antivirus software (e.g., Kaspersky, Defender) may flag it as `HackTool` or `RiskTool`.
-- **Solution:** Add the application folder to your whitelist (exclusions).
+### Game Filter
+Port range expansion (1024-65535) for game DPI bypass. Modes: TCP+UDP / TCP / UDP.
+
+### IPSet
+IP-based filtering. Three modes: loaded / disabled / all addresses. Download latest list from GitHub.
+
+### Auto-Tune
+Automated testing of **12 IPSet × GameFilter combinations**. Finds optimal settings by speed and success rate.
+
+### Hosts File
+Check and update system hosts file from Flowseal GitHub repository.
+
+### Service Management
+Install / stop Zapret Windows Service.
+
+---
+
+## 🔄 Updates
+
+| Component | Source |
+| :--- | :--- |
+| Flowseal Zapret Engine | [Flowseal/zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) |
+| FluxRoute Application | [mx57/FluxRoute_AI](https://github.com/mx57/FluxRoute_AI) |
+| ByeDPI (CIADPI) | ByeDPI repository |
+| Warp (WARP-PLUS) | Warp-plus repository |
+| TG WS Proxy | [Flowseal/tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy) |
+
+- Check on startup (optional)
+- Auto-download on first launch (if `engine/` folder is empty)
+- Force reinstall option
+
+---
+
+## 📋 Domains & Presets
+
+### Domain Manager
+- Two lists: **targets** (for bypass) and **exclusions**
+- Auto-sync with `list-general-user.txt` for winws.exe
+- Input normalization (strips protocols, www, trailing slashes)
+
+### Config Presets
+- Save current profile + GameFilter + IPSet settings
+- **Auto-switch** by running process (game detection)
+- Background monitoring every 3 seconds
+
+---
+
+## 📊 Unified Log Viewer
+
+- 8 categories: App, Orchestrator, Scan, Launch, TG Proxy, Update, Service, Errors
+- Text search, errors-only filter
+- Auto-scroll, copy to clipboard, save to file
+
+---
+
+## 🏗 Architecture
+
+```
+FluxRoute.slnx
+├── FluxRoute/              # WPF UI (11 tabs, GitHub-dark theme)
+│   ├── Views/              # MainWindow.xaml (2488 lines)
+│   └── ViewModels/         # MVVM: Main, AI, Orchestrator, TgProxy, Service...
+├── FluxRoute.AI/           # AI subsystem
+│   ├── Services/           # AiOrchestrator, BanditSelector, StrategyEvolver
+│   └── Math/               # WilsonScore
+├── FluxRoute.Core/         # Engine abstraction
+│   ├── Services/           # IDpiEngine, Zapret/ByeDpi/WarpEngine, Connectivity
+│   └── Models/             # EngineProfile, StrategyGenome (40+ parameters)
+├── FluxRoute.Updater/      # 5 update channels
+└── FluxRoute.Core.Tests/   # Unit tests
+```
+
+**Stack:** .NET 10 · C# · WPF · CommunityToolkit.Mvvm · Microsoft.Extensions.DI · Serilog
+
+---
+
+## 🚀 Quick Start
+
+1. Download [`FluxRoute-v1.7.1-portable.zip`](https://github.com/mx57/FluxRoute_AI/releases/tag/v1.7.1)
+2. Extract to any folder
+3. Run `FluxRoute.exe` **as Administrator**
+4. Select a profile and click **▶ Start**
+
+> The engine downloads automatically on first launch.
+
+---
+
+## ⚠️ Security
+
+This project uses the **WinDivert** driver for packet modification.
+- **Not a virus** — it's a system administration tool
+- Antivirus software may flag it as `HackTool` / `RiskTool`
+- **Solution:** add the folder to your antivirus exclusions
 
 ---
 
 ## 🙏 Acknowledgments
 
-- **[klondike0x/FluxRoute](https://github.com/klondike0x/FluxRoute)** — Foundation and architecture.
-- **[bol-van/zapret](https://github.com/bol-van/zapret)** — The legendary bypass core.
-- **[hiddify/warp-plus](https://github.com/hiddify/warp-plus)** — The best CLI Warp implementation.
+- **[klondike0x/FluxRoute](https://github.com/klondike0x/FluxRoute)** — base architecture
+- **[bol-van/zapret](https://github.com/bol-van/zapret)** — DPI bypass core
+- **[Flowseal](https://github.com/Flowseal)** — BAT profiles, TG Proxy, auto-updates
+- **[hiddify/warp-plus](https://github.com/hiddify/warp-plus)** — Warp CLI implementation
+
+---
+
+## 📅 Roadmap
+
+- [ ] Sing-Box integration (VLESS, Reality)
+- [ ] P2P genome sharing between users
+- [ ] Real-time traffic visualization
 
 ---
 
@@ -115,7 +233,7 @@ This project uses the **WinDivert** driver to modify network packets on-the-fly.
 
 **Developed by the community for a free internet.**
 
-[mx57](https://github.com/mx57) © 2026. Licensed under GPLv3.
+[mx57](https://github.com/mx57) © 2026 · GPLv3
 
 **[⭐ Star this repo if it helped you!](https://github.com/mx57/FluxRoute_AI)**
 
