@@ -95,6 +95,43 @@
             </Setter>
         </Style>
 
+        <!-- ══════ LISTBOXITEM ══════ -->
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}"
+                                SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#1C2128"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#264F78"/>
+                                <Setter Property="Foreground" Value="#E6EDF3"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4FC3F7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- ══════ ACCENT BUTTON ══════ -->
         <Style x:Key="AccentBtn" TargetType="Button" BasedOn="{StaticResource TermBtn}">
             <Setter Property="Foreground" Value="#4FC3F7"/>
@@ -1104,7 +1141,9 @@
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,4" d:IsLocked="True">
                                         <TextBlock Style="{StaticResource Lbl}" Text="Интервал (мин): " Margin="0,0,8,0" d:IsLocked="True"/>
                                         <TextBox Text="{Binding OrchestratorInterval, UpdateSourceTrigger=PropertyChanged}"
-                                                 Width="50" Height="26" VerticalContentAlignment="Center" d:IsLocked="True"/>
+                                                 Width="50" Height="26" VerticalContentAlignment="Center" d:IsLocked="True"
+                                                 ToolTip="Интервал проверки (в минутах)"
+                                                 AutomationProperties.Name="Интервал проверки оркестратора"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,4,0,0" d:IsLocked="True">
                                         <TextBlock Style="{StaticResource Lbl}" Text="Следующая проверка: " Margin="0,0,4,0" d:IsLocked="True"/>
@@ -1294,7 +1333,9 @@
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10" d:IsLocked="True">
                                         <TextBlock Style="{StaticResource Lbl}" Text="Exploration (‰): " VerticalAlignment="Center" Margin="0,0,8,0" d:IsLocked="True"/>
                                         <TextBox Text="{Binding AiExplorationPermil, UpdateSourceTrigger=PropertyChanged}"
-                                                 Width="60" Height="26" VerticalContentAlignment="Center" d:IsLocked="True"/>
+                                                 Width="60" Height="26" VerticalContentAlignment="Center" d:IsLocked="True"
+                                                 ToolTip="Коэффициент Exploration (в промилле)"
+                                                 AutomationProperties.Name="Коэффициент Exploration ИИ"/>
                                     </StackPanel>
 
                                     <StackPanel Orientation="Horizontal" Margin="0,4,0,10" d:IsLocked="True">
@@ -1353,7 +1394,8 @@
                                         <ScrollViewer VerticalScrollBarVisibility="Auto" d:IsLocked="True">
                                             <ListBox ItemsSource="{Binding AiStrategyRows}"
                                                      Background="Transparent" BorderThickness="0"
-                                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" d:IsLocked="True">
+                                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" d:IsLocked="True"
+                                                     AutomationProperties.Name="Список стратегий ИИ">
                                                 <ListBox.ItemTemplate>
                                                     <DataTemplate>
                                                         <Border Background="#161B22" Padding="10,6" Margin="0,2" d:IsLocked="True">
@@ -2390,19 +2432,19 @@
                                                Text="FluxRoute использует экосистему проектов:" d:IsLocked="True"/>
                                     <StackPanel Margin="8,8,0,0" d:IsLocked="True">
                                         <TextBlock FontFamily="Segoe UI" Foreground="#C9D1D9" FontSize="12" Margin="0,3" d:IsLocked="True">
-                                            <Run Text="• "/><Hyperlink NavigateUri="https://github.com/basil00/WinDivert" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7">WinDivert</Hyperlink>
+                                            <Run Text="• "/><Hyperlink NavigateUri="https://github.com/basil00/WinDivert" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7" ToolTip="Перейти: https://github.com/basil00/WinDivert">WinDivert</Hyperlink>
                                             <Run Text=" — низкоуровневая основа"/>
                                         </TextBlock>
                                         <TextBlock FontFamily="Segoe UI" Foreground="#C9D1D9" FontSize="12" Margin="0,3" d:IsLocked="True">
-                                            <Run Text="• "/><Hyperlink NavigateUri="https://github.com/bol-van/zapret" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7">bol-van/zapret</Hyperlink>
+                                            <Run Text="• "/><Hyperlink NavigateUri="https://github.com/bol-van/zapret" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7" ToolTip="Перейти: https://github.com/bol-van/zapret">bol-van/zapret</Hyperlink>
                                             <Run Text=" — оригинальный проект"/>
                                         </TextBlock>
                                         <TextBlock FontFamily="Segoe UI" Foreground="#C9D1D9" FontSize="12" Margin="0,3" d:IsLocked="True">
-                                            <Run Text="• "/><Hyperlink NavigateUri="https://github.com/bol-van/zapret-win-bundle" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7">zapret-win-bundle</Hyperlink>
+                                            <Run Text="• "/><Hyperlink NavigateUri="https://github.com/bol-van/zapret-win-bundle" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7" ToolTip="Перейти: https://github.com/bol-van/zapret-win-bundle">zapret-win-bundle</Hyperlink>
                                             <Run Text=" — Windows-бандл"/>
                                         </TextBlock>
                                         <TextBlock FontFamily="Segoe UI" Foreground="#C9D1D9" FontSize="12" Margin="0,3" d:IsLocked="True">
-                                            <Run Text="• "/><Hyperlink NavigateUri="https://github.com/Flowseal/zapret-discord-youtube" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7">Flowseal/zapret-discord-youtube</Hyperlink>
+                                            <Run Text="• "/><Hyperlink NavigateUri="https://github.com/Flowseal/zapret-discord-youtube" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7" ToolTip="Перейти: https://github.com/Flowseal/zapret-discord-youtube">Flowseal/zapret-discord-youtube</Hyperlink>
                                             <Run Text=" — основа engine"/>
                                         </TextBlock>
                                     </StackPanel>
@@ -2412,13 +2454,13 @@
                                     <TextBlock Style="{StaticResource SecH}" Text="ВДОХНОВЕНИЕ" d:IsLocked="True"/>
                                     <StackPanel Margin="8,0,0,0" d:IsLocked="True">
                                         <TextBlock FontFamily="Segoe UI" Foreground="#C9D1D9" FontSize="12" Margin="0,3" d:IsLocked="True">
-                                            <Run Text="• "/><Hyperlink NavigateUri="https://github.com/medvedeff-true/Zapret-GUI" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7">medvedeff-true/Zapret-GUI</Hyperlink>
+                                            <Run Text="• "/><Hyperlink NavigateUri="https://github.com/medvedeff-true/Zapret-GUI" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7" ToolTip="Перейти: https://github.com/medvedeff-true/Zapret-GUI">medvedeff-true/Zapret-GUI</Hyperlink>
                                         </TextBlock>
                                         <TextBlock FontFamily="Segoe UI" Foreground="#C9D1D9" FontSize="12" Margin="0,3" d:IsLocked="True">
-                                            <Run Text="• "/><Hyperlink NavigateUri="https://github.com/Virenbar/ZapretControl" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7">Virenbar/ZapretControl</Hyperlink>
+                                            <Run Text="• "/><Hyperlink NavigateUri="https://github.com/Virenbar/ZapretControl" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7" ToolTip="Перейти: https://github.com/Virenbar/ZapretControl">Virenbar/ZapretControl</Hyperlink>
                                         </TextBlock>
                                         <TextBlock FontFamily="Segoe UI" Foreground="#C9D1D9" FontSize="12" Margin="0,3" d:IsLocked="True">
-											<Run Text="• "/><Hyperlink NavigateUri="https://github.com/youtubediscord/zapret" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7">youtubediscord/zapret</Hyperlink>
+											<Run Text="• "/><Hyperlink NavigateUri="https://github.com/youtubediscord/zapret" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7" ToolTip="Перейти: https://github.com/youtubediscord/zapret">youtubediscord/zapret</Hyperlink>
                                         </TextBlock>
                                     </StackPanel>
 
@@ -2427,19 +2469,19 @@
                                     <TextBlock Style="{StaticResource SecH}" Text="ПОЛЕЗНЫЕ ССЫЛКИ" d:IsLocked="True"/>
                                     <StackPanel Margin="8,0,0,0" d:IsLocked="True">
                                         <TextBlock FontFamily="Segoe UI" Foreground="#C9D1D9" FontSize="12" Margin="0,3" d:IsLocked="True">
-											<Run Text="• "/><Hyperlink NavigateUri="https://github.com/klondike0x/FluxRoute" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7">FluxRoute на GitHub</Hyperlink>
+											<Run Text="• "/><Hyperlink NavigateUri="https://github.com/klondike0x/FluxRoute" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7" ToolTip="Перейти: https://github.com/klondike0x/FluxRoute">FluxRoute на GitHub</Hyperlink>
 											<Run Text=" — репозиторий проекта"/>
                                         </TextBlock>
                                         <TextBlock FontFamily="Segoe UI" Foreground="#C9D1D9" FontSize="12" Margin="0,3" d:IsLocked="True">
-											<Run Text="• "/><Hyperlink NavigateUri="https://github.com/klondike0x/FluxRoute/releases" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7">Релизы</Hyperlink>
+											<Run Text="• "/><Hyperlink NavigateUri="https://github.com/klondike0x/FluxRoute/releases" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7" ToolTip="Перейти: https://github.com/klondike0x/FluxRoute/releases">Релизы</Hyperlink>
 											<Run Text=" — скачать последнюю версию"/>
                                         </TextBlock>
                                         <TextBlock FontFamily="Segoe UI" Foreground="#C9D1D9" FontSize="12" Margin="0,3" d:IsLocked="True">
-											<Run Text="• "/><Hyperlink NavigateUri="https://github.com/klondike0x/FluxRoute/issues" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7">Issues</Hyperlink>
+											<Run Text="• "/><Hyperlink NavigateUri="https://github.com/klondike0x/FluxRoute/issues" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7" ToolTip="Перейти: https://github.com/klondike0x/FluxRoute/issues">Issues</Hyperlink>
 											<Run Text=" — баг-репорты и предложения"/>
                                         </TextBlock>
                                         <TextBlock FontFamily="Segoe UI" Foreground="#C9D1D9" FontSize="12" Margin="0,3" d:IsLocked="True">
-											<Run Text="• "/><Hyperlink NavigateUri="https://github.com/klondike0x" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7">klondike0x</Hyperlink>
+											<Run Text="• "/><Hyperlink NavigateUri="https://github.com/klondike0x" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#4FC3F7" ToolTip="Перейти: https://github.com/klondike0x">klondike0x</Hyperlink>
 											<Run Text=" — страница автора на GitHub"/>
                                         </TextBlock>
                                     </StackPanel>
