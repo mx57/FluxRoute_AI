@@ -1126,9 +1126,13 @@
                                             <Button.Style>
                                                 <Style TargetType="Button" BasedOn="{StaticResource TermBtn}">
                                                     <Setter Property="Content" Value="▶ Запустить оркестратор"/>
+                                                    <Setter Property="ToolTip" Value="Запустить автоматический оркестратор"/>
+                                                    <Setter Property="AutomationProperties.Name" Value="Запустить оркестратор"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding OrchestratorRunning}" Value="True">
                                                             <Setter Property="Content" Value="⏹ Остановить оркестратор"/>
+                                                            <Setter Property="ToolTip" Value="Остановить работу оркестратора"/>
+                                                            <Setter Property="AutomationProperties.Name" Value="Остановить оркестратор"/>
                                                             <Setter Property="BorderBrush" Value="#DA3633"/>
                                                             <Setter Property="Foreground" Value="#F85149"/>
                                                         </DataTrigger>
@@ -1214,12 +1218,16 @@
                                             </ItemsControl>
                                             <Button Content="🔍 Проверить сейчас" Style="{StaticResource TermBtn}"
                                                     HorizontalAlignment="Left" Margin="0,10,0,0"
-                                                    Command="{Binding CheckNowCommand}" d:IsLocked="True"/>
+                                                    Command="{Binding CheckNowCommand}" d:IsLocked="True"
+                                                    ToolTip="Запустить внеочередную проверку доступности для всех включенных стратегий ИИ"
+                                                    AutomationProperties.Name="Проверить стратегии ИИ сейчас"/>
                                         </StackPanel>
                                     </Border>
 
                                     <Button HorizontalAlignment="Left" Margin="0,0,0,8"
-                                            Command="{Binding CheckNowCommand}" d:IsLocked="True">
+                                            Command="{Binding CheckNowCommand}" d:IsLocked="True"
+                                            ToolTip="Запустить внеочередную проверку доступности сайтов"
+                                            AutomationProperties.Name="Проверить сейчас">
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource TermBtn}">
                                                 <Setter Property="Content" Value="🔍 Проверить сейчас"/>
@@ -1237,7 +1245,9 @@
 
                                     <TextBlock Style="{StaticResource SecH}" Text="РЕЙТИНГ ПРОФИЛЕЙ" d:IsLocked="True"/>
                                     <Button HorizontalAlignment="Left" Margin="0,0,0,10"
-                                            Command="{Binding ScanProfilesCommand}" d:IsLocked="True">
+                                            Command="{Binding ScanProfilesCommand}" d:IsLocked="True"
+                                            ToolTip="Просканировать все доступные профили для поиска лучшего"
+                                            AutomationProperties.Name="Сканировать все профили">
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource AccentBtn}">
                                                 <Setter Property="Content" Value="📊 Сканировать все профили"/>
@@ -1278,7 +1288,9 @@
 
                                     <Button Content="🗑 Очистить лог" Visibility="Collapsed" Style="{StaticResource TermBtn}"
                                             HorizontalAlignment="Left" Margin="0,10,0,0"
-                                            Command="{Binding ClearOrchestratorLogsCommand}" d:IsLocked="True"/>
+                                            Command="{Binding ClearOrchestratorLogsCommand}" d:IsLocked="True"
+                                            ToolTip="Очистить накопленный лог оркестратора"
+                                            AutomationProperties.Name="Очистить лог оркестратора"/>
 
                                     <Border Style="{StaticResource LogArea}" Margin="0,8,0,0" Visibility="Collapsed" d:IsLocked="True">
                                         <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -1838,9 +1850,13 @@
                                             <Button.Style>
                                                 <Style TargetType="Button" BasedOn="{StaticResource TermBtn}">
                                                     <Setter Property="Content" Value="🎮 Включить"/>
+                                                    <Setter Property="ToolTip" Value="Включить фильтрацию портов для игр"/>
+                                                    <Setter Property="AutomationProperties.Name" Value="Включить игровой фильтр"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding GameFilterEnabled}" Value="True">
                                                             <Setter Property="Content" Value="🎮 Выключить"/>
+                                                            <Setter Property="ToolTip" Value="Выключить игровой фильтр"/>
+                                                            <Setter Property="AutomationProperties.Name" Value="Выключить игровой фильтр"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -1848,7 +1864,9 @@
                                         </Button>
                                         <ComboBox ItemsSource="{Binding GameFilterProtocols}"
                                                   SelectedItem="{Binding GameFilterProtocol}"
-                                                  Width="120" Margin="10,0,0,0" d:IsLocked="True"/>
+                                                  Width="120" Margin="10,0,0,0" d:IsLocked="True"
+                                                  ToolTip="Протокол для фильтрации"
+                                                  AutomationProperties.Name="Выбор протокола игрового фильтра"/>
                                     </StackPanel>
 
                                     <Rectangle Style="{StaticResource Sep}" d:IsLocked="True"/>
@@ -1864,8 +1882,12 @@
                                                Text="loaded — фильтрация по списку IP · none — отключена · any — все адреса" d:IsLocked="True"/>
                                     <StackPanel Orientation="Horizontal" d:IsLocked="True">
                                         <Button Content="🔄 Переключить режим" Style="{StaticResource TermBtn}"
-                                                Margin="0,0,10,0" Command="{Binding CycleIpSetModeCommand}" d:IsLocked="True"/>
-                                        <Button Command="{Binding UpdateIpSetListCommand}" d:IsLocked="True">
+                                                Margin="0,0,10,0" Command="{Binding CycleIpSetModeCommand}" d:IsLocked="True"
+                                                ToolTip="Переключить режим фильтрации (loaded/none/any)"
+                                                AutomationProperties.Name="Переключить режим IPSet"/>
+                                        <Button Command="{Binding UpdateIpSetListCommand}" d:IsLocked="True"
+                                                ToolTip="Загрузить актуальный список IP-адресов для фильтрации"
+                                                AutomationProperties.Name="Обновить список IPSet">
                                             <Button.Style>
                                                 <Style TargetType="Button" BasedOn="{StaticResource AccentBtn}">
                                                     <Setter Property="Content" Value="⬇️ Обновить IPSet"/>
@@ -1887,7 +1909,9 @@
                                                Margin="0,0,0,8" TextWrapping="Wrap"
                                                Text="Проверяет и обновляет системный hosts файл." d:IsLocked="True"/>
                                     <Button Content="🔍 Проверить / обновить Hosts" HorizontalAlignment="Left"
-                                            Command="{Binding UpdateHostsFileCommand}" d:IsLocked="True">
+                                            Command="{Binding UpdateHostsFileCommand}" d:IsLocked="True"
+                                            ToolTip="Проверить системный файл hosts на наличие необходимых записей и обновить их"
+                                            AutomationProperties.Name="Обновить файл Hosts">
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource TermBtn}">
                                                 <Style.Triggers>
@@ -1909,12 +1933,16 @@
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0" d:IsLocked="True">
                                         <Button Content="📦 Установить" Style="{StaticResource GreenBtn}"
-                                                Margin="0,0,10,0" Command="{Binding InstallZapretServiceCommand}" d:IsLocked="True"/>
+                                                Margin="0,0,10,0" Command="{Binding InstallZapretServiceCommand}" d:IsLocked="True"
+                                                ToolTip="Установить Zapret как системную службу Windows"
+                                                AutomationProperties.Name="Установить службу Zapret"/>
                                         <Button Content="⏹ Остановить" Style="{StaticResource RedBtn}"
-                                                Margin="0,0,10,0" Command="{Binding ForceStopZapretServiceCommand}" d:IsLocked="True"/>
+                                                Margin="0,0,10,0" Command="{Binding ForceStopZapretServiceCommand}" d:IsLocked="True"
+                                                ToolTip="Принудительно остановить и удалить службу Zapret"
+                                                AutomationProperties.Name="Остановить службу Zapret"/>
                                         <Button Content="🔄" Style="{StaticResource TermBtn}"
                                                 Command="{Binding RefreshServiceInfoCommand}"
-                                                ToolTip="Обновить информацию о службе"
+                                                ToolTip="Обновить информацию о статусе службы в системе"
                                                 AutomationProperties.Name="Обновить статус службы" d:IsLocked="True"/>
                                     </StackPanel>
 
