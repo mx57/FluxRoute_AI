@@ -1,56 +1,249 @@
 <div align="center">
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/FluxRoute-white.svg">
+  <source media="(prefers-color-scheme: light)" srcset="./assets/FluxRoute-dark.svg">
+  <img width="650" alt="BSDPI_AI Logo" src="./assets/FluxRoute-dark.svg" />
+</picture>
+
 # BSDPI_AI
 
-**Intelligent DPI-bypass strategy auto-selection system**
+### Self-Learning DPI Bypass for Windows
 
-A Windows application that uses **Thompson Sampling** and **genetic evolution** to automatically find and switch optimal Deep Packet Inspection (DPI) bypass parameters.
+**Unifies Zapret, ByeDPI, and Cloudflare Warp into a single adaptive system with an AI orchestrator.**
+
+[🇷🇺 Русский](README.md) | [📥 Download](https://github.com/mx57/BSDPI_AI/releases) | [🐛 Report Issue](https://github.com/mx57/BSDPI_AI/issues)
+
+---
+
+[![Stars](https://img.shields.io/github/stars/mx57/BSDPI_AI?style=for-the-badge&logo=github&color=FFD700)](https://github.com/mx57/BSDPI_AI)
+[![Releases](https://img.shields.io/github/v/release/mx57/BSDPI_AI?include_prereleases&sort=semver&logo=github&label=version&style=for-the-badge&color=3FB950)](https://github.com/mx57/BSDPI_AI/releases)
+[![Downloads](https://img.shields.io/github/downloads/mx57/BSDPI_AI/total?logo=github&label=downloads&style=for-the-badge&color=4FC3F7)](https://github.com/mx57/BSDPI_AI/releases)
+[![.NET 10](https://img.shields.io/badge/.NET_10-512BD4?logo=dotnet&style=for-the-badge)](https://dotnet.microsoft.com/)
+[![License](https://img.shields.io/badge/GPLv3-blue.svg?style=for-the-badge)](./LICENSE)
 
 </div>
 
 ---
 
-## Features
+## Why BSDPI_AI?
 
-- **AI Orchestrator** — automated cycle: site probing → scoring → strategy switching/evolution
-- **Thompson Sampling (Bandit)** — Bayesian approach to strategy selection with exploration/exploitation balance
-- **Genetic Evolution** — crossover and mutations of top strategies to generate new ones
-- **Network Fingerprint** — per-network strategy binding (Ethernet, Wi-Fi, VPN)
-- **Visual Chain Builder** — drag-and-drop canvas for constructing DPI bypass pipelines
-- **Dual Engine** — supports **zapret** (winws.exe) and **ByeDPI** (ciadpi.exe), including hybrid mode
-- **Telegram WS Proxy** — built-in WebSocket proxy for Telegram
-- **Auto-Update** — engine updates from GitHub releases
-- **Diagnostics** — file, process, and connectivity checks
+Typical GUIs for DPI tools just launch processes. **BSDPI_AI thinks.** Censorship and DPI filters change constantly — what worked yesterday may fail today. Our system uses mathematical models to automatically adapt to your specific ISP and network.
+
+> **This fork is the parent of all AI features that made it into the original FluxRoute release.**
+
+---
+
+## Key Features
+
+| Category | Features |
+| :--- | :--- |
+| **Engines** | Zapret (`winws.exe`), ByeDPI (`ciadpi.exe`), Cloudflare Warp (`warp-plus.exe`) |
+| **Modes** | Standalone · Hybrid · Warp · Warp+Zapret · Warp+ByeDPI · Chained (×2) · Bypass |
+| **AI** | Thompson Sampling · Genetic Evolution · Wilson Score · Fast Start · Auto-MTU |
+| **Network** | Network Fingerprinting (per-network policy) · Auto-switch on network change |
+| **Automation** | Auto Warp registration · Background monitoring · Auto-update from GitHub |
+| **TG WS Proxy** | Telegram WebSocket proxy with auto-install and Cloudflare support |
+| **Service** | Game Filter · IPSet · Auto-Tune · Zapret Windows Service management |
+| **Updates** | 5 independent channels: engine, app, ByeDPI, Warp, TG Proxy |
+| **Domains** | Domain manager (targets + exclusions) · Sync with winws.exe |
+| **Presets** | Save configurations · Auto-switch by running process |
+| **Diagnostics** | Component checks · Diagnostic bundle export · Unified log viewer |
+| **Chain Builder** | Visual drag-and-drop DPI bypass chain constructor |
+
+---
+
+## Artificial Intelligence
+
+### Thompson Sampling (Multi-Armed Bandits)
+
+The AI orchestrator analyzes strategy success rates and uses **Beta distributions** to balance:
+- **Exploitation** — using the best proven strategy
+- **Exploration** — periodically testing new strategies that may work better
+
+Configurable `ExplorationRate` (‰) controls the balance.
+
+### Genetic Evolution
+
+The system "grows" new BAT profiles:
+1. **Crossover** of two best strategies' parameters
+2. **Mutation** of 15 parameter types (split, desync, fake-TTL, fake-TLS, fooling, MTU, etc.)
+3. **Validation** and **deduplication** via `GenomeSignature`
+4. **Survival** of the fittest — weak strategies are auto-deleted
+
+### Network Fingerprinting
+
+- Data collected: network interface type, IPs, gateway, DNS servers, subnet prefixes
+- SHA-256 hash for network identification
+- **Per-network AI policy** — works differently on home Wi-Fi vs mobile internet
+
+### Fast Start
+
+On launch or network change, instantly probes the **top 3 strategies** for quick selection.
+
+### Wilson Score
+
+Strategies ranked by **Wilson lower bound** (95% confidence interval) — statistically rigorous quality estimation.
+
+---
+
+## Operating Modes
+
+| Mode | Description | ISP Evasion Difficulty |
+| :--- | :--- | :--- |
+| **Zapret** | Primary DPI-bypass engine | Low |
+| **ByeDPI** | Alternative DPI-bypass engine | Low |
+| **Warp** | Cloudflare WireGuard VPN | Medium |
+| **Hybrid** | Zapret + ByeDPI parallel, smart switching | High |
+| **Warp+Zapret** | Warp + Zapret parallel | High |
+| **Warp+ByeDPI** | Warp + ByeDPI parallel | High |
+| **Warp→Zapret Chained** | Zapret tunneled through Warp SOCKS5 | **Maximum** |
+| **Warp→ByeDPI Chained** | ByeDPI tunneled through Warp SOCKS5 | **Maximum** |
+| **Bypass** | No protection, pass-through | — |
+
+---
+
+## TG WS Proxy
+
+Built-in Telegram WebSocket proxy for bypassing Telegram blocks:
+
+- **Auto-install** — downloads Python Embeddable, pip, cryptography, and proxy source files
+- **Cloudflare Proxy** — traffic proxying via Cloudflare
+- **DC Mapping** — Telegram DC IP address configuration
+- **Deep Link** — open proxy in Telegram with one button
+- **Auto-start** on app launch
+
+---
+
+## Service & Settings
+
+### Game Filter
+Port range expansion (1024-65535) for game DPI bypass. Modes: TCP+UDP / TCP / UDP.
+
+### IPSet
+IP-based filtering. Three modes: loaded / disabled / all addresses. Download latest list from GitHub.
+
+### Auto-Tune
+Automated testing of **12 IPSet × GameFilter combinations**. Finds optimal settings by speed and success rate.
+
+### Hosts File
+Check and update system hosts file from Flowseal GitHub repository.
+
+### Service Management
+Install / stop Zapret Windows Service.
+
+---
+
+## Visual Chain Builder
+
+Full drag-and-drop constructor for building DPI bypass pipelines:
+
+- **8 node types**: Program, Check, Zapret, ByeDPI, WARP, Delay, Log, Internet
+- **Bezier curves** for connections between ports
+- **Zoom** (mouse wheel) and **pan** (Alt+LMB / middle button)
+- **Visual feedback** on node selection (blue border)
+- Save/load chains as JSON files (`chains/*.chain.json`)
+
+---
+
+## Updates
+
+| Component | Source |
+| :--- | :--- |
+| Flowseal Zapret Engine | [Flowseal/zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) |
+| BSDPI_AI Application | [mx57/BSDPI_AI](https://github.com/mx57/BSDPI_AI) |
+| ByeDPI (CIADPI) | ByeDPI repository |
+| Warp (WARP-PLUS) | Warp-plus repository |
+| TG WS Proxy | [Flowseal/tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy) |
+
+- Check on startup (optional)
+- Auto-download on first launch (if `engine/` folder is empty)
+- Force reinstall option
+
+---
+
+## Domains & Presets
+
+### Domain Manager
+- Two lists: **targets** (for bypass) and **exclusions**
+- Auto-sync with `list-general-user.txt` for winws.exe
+- Input normalization (strips protocols, www, trailing slashes)
+
+### Config Presets
+- Save current profile + GameFilter + IPSet settings
+- **Auto-switch** by running process (game detection)
+- Background monitoring every 3 seconds
+
+---
+
+## Unified Log Viewer
+
+- 8 categories: App, Orchestrator, Scan, Launch, TG Proxy, Update, Service, Errors
+- Text search, errors-only filter
+- Auto-scroll, copy to clipboard, save to file
+
+---
 
 ## Architecture
 
 ```
 BSDPI_AI.slnx
 ├── BSDPI_AI/              — WPF GUI (MVVM, 11 tabs)
-├── BSDPI_AI.AI/           — AI subsystem: Thompson Sampling + genetic evolution
-├── BSDPI_AI.Core/         — Core: DPI engines, orchestrator, ChainBuilder
-├── BSDPI_AI.Updater/      — Auto-update engine/
-└── BSDPI_AI.Core.Tests/   — Unit tests
+│   ├── Views/             — MainWindow.xaml
+│   └── ViewModels/        — Main, AI, Orchestrator, TgProxy, Service...
+├── BSDPI_AI.AI/           — AI subsystem
+│   ├── Services/          — AiOrchestrator, BanditSelector, StrategyEvolver
+│   └── Math/              — WilsonScore
+├── BSDPI_AI.Core/         — Engine abstraction
+│   ├── Services/          — IDpiEngine, Zapret/ByeDpi/WarpEngine, Connectivity
+│   └── Models/            — EngineProfile, StrategyGenome (40+ parameters)
+├── BSDPI_AI.Updater/      — 5 update channels
+└── BSDPI_AI.Core.Tests/   — Unit tests (53 tests)
 ```
 
-**Dependency chain:** `BSDPI_AI` → `BSDPI_AI.AI` → `BSDPI_AI.Core` ← `BSDPI_AI.Updater`
+**Stack:** .NET 10 · C# · WPF · CommunityToolkit.Mvvm · Microsoft.Extensions.DI · Serilog · LiveChartsCore
 
-## How the AI Works
+---
 
-```
-1. SyncBuiltins()         — scan engine/*.bat → genome registry
-2. PickAndApplyInitial()  — Thompson Sampling → select best strategy
-3. LoopAsync()            — probe cycle every N minutes:
-   ├─ Capture()              — network fingerprint
-   ├─ ProbeCurrent()         — check sites via current strategy
-   ├─ RecordBanditSuccess/Failure — update Alpha/Beta
-   ├─ MaybeEvolve()          — evolve when enough probes collected
-   └─ SwitchToAlternative()  — switch strategy after 2+ consecutive failures
-```
+## GUI Tabs
+
+| # | Tab | Description |
+|---|-----|-------------|
+| 0 | Main | Status, start/stop, domains |
+| 1 | TG Proxy | Telegram WebSocket Proxy |
+| 2 | Orchestrator | Classic orchestrator (profile rating) |
+| 3 | AI | AI orchestrator, strategies, evolution, Wilson Score |
+| 4 | Update | Update engine/ from GitHub |
+| 5 | Diagnostics | File, process, connectivity checks |
+| 6 | Service | Game Filter, IPSet, Auto-Tune, zapret service |
+| 7 | About | Project information |
+| 8 | Logs | Unified log viewer (8 categories) |
+| 9 | ByeDPI | ByeDPI settings (SOCKS5, ports, parameters) |
+| 10 | WARP | Cloudflare Warp config generator (WireGuard) |
+| 11 | Chain Builder | Visual DPI bypass chain constructor |
+
+---
+
+## AI Settings
+
+| Parameter | Default | Description |
+|-----------|:-------:|-------------|
+| `Enabled` | `false` | Enable AI orchestrator |
+| `ExplorationRatePermil` | `100` | Exploration in ‰ (100‰ = 10%) |
+| `MaxEvolvedStrategies` | `24` | Max evolved strategies |
+| `EvolutionIntervalMinutes` | `60` | Evolution interval |
+| `MinProbesBeforeEvolve` | `6` | Min probes before evolution |
+| `KeepHistoryDays` | `14` | History retention (days) |
+| `FastStartEnabled` | `true` | Fast start on launch |
+| `ParetoEnabled` | `true` | Pareto optimization |
+| `ElitismEnabled` | `true` | Elitism in genetic evolution |
+| `AutoDeleteBelowScore` | `60` | Auto-delete strategies below threshold |
+
+---
 
 ## Build & Run
 
-**Requirements:** .NET 10 SDK, Windows
+**Requirements:** .NET 10 SDK, Windows 10/11 x64, administrator privileges
 
 ```bash
 dotnet restore BSDPI_AI.slnx
@@ -70,40 +263,51 @@ dotnet test BSDPI_AI.slnx
 dotnet publish BSDPI_AI/BSDPI_AI.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
 ```
 
-## GUI Tabs
+---
 
-| # | Tab | Description |
-|---|-----|-------------|
-| 0 | Main | Status, start/stop, domains |
-| 1 | TG Proxy | Telegram WebSocket Proxy |
-| 2 | Orchestrator | Classic orchestrator (rating) |
-| 3 | AI | AI orchestrator, strategies, evolution |
-| 4 | Update | Update engine/ |
-| 5 | Diagnostics | File and process checks |
-| 6 | Service | Game filter, ipset, zapret service |
-| 7 | About | Application info |
-| 8 | Logs | Application logs |
-| 9 | ByeDPI | ByeDPI settings |
-| 10 | WARP | Cloudflare Warp config generator |
-| 11 | Chain Builder | Visual DPI bypass chain constructor |
+## Security
 
-## AI Settings
+This project uses the **WinDivert** driver for packet modification.
+- **Not a virus** — it's a system administration tool
+- Antivirus software may flag it as `HackTool` / `RiskTool`
+- **Solution:** add the folder to your antivirus exclusions
 
-| Parameter | Default | Description |
-|-----------|:-------:|-------------|
-| `Enabled` | `false` | Enable AI orchestrator |
-| `ExplorationRatePermil` | `100` | Exploration in ‰ (100‰ = 10%) |
-| `MaxEvolvedStrategies` | `24` | Max evolved strategies |
-| `EvolutionIntervalMinutes` | `60` | Evolution interval |
-| `MinProbesBeforeEvolve` | `6` | Min probes before evolution |
-| `KeepHistoryDays` | `14` | History retention (days) |
-| `AutoDeleteBelowScore` | `60` | Auto-delete strategies below this threshold |
+---
+
+## Acknowledgments
+
+- **[klondike0x/FluxRoute](https://github.com/klondike0x/FluxRoute)** — base architecture
+- **[bol-van/zapret](https://github.com/bol-van/zapret)** — DPI bypass core
+- **[Flowseal](https://github.com/Flowseal)** — BAT profiles, TG Proxy, auto-updates
+- **[hiddify/warp-plus](https://github.com/hiddify/warp-plus)** — Warp CLI implementation
+- **[basil00/WinDivert](https://github.com/basil00/WinDivert)** — packet modification driver
+
+---
+
+## Roadmap
+
+- [ ] Sing-Box integration (VLESS, Reality)
+- [ ] P2P genome sharing between users
+- [ ] Real-time traffic visualization
+- [ ] Cloud AI Sync — fetch ready-made genomes from the cloud
+
+---
 
 ## License
 
 This project is licensed under [GPL-3.0](LICENSE).
 
-Based on [klondike0x/FluxRoute](https://github.com/klondike0x/FluxRoute) (GPLv3).
+---
+
+<div align="center">
+
+**Developed by the community for a free internet.**
+
+[mx57](https://github.com/mx57) © 2026 · GPLv3
+
+**[⭐ Star this repo if it helped you!](https://github.com/mx57/BSDPI_AI)**
+
+</div>
 
 ---
 
