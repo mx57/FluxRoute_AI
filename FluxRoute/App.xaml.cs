@@ -5,6 +5,7 @@ using System.Windows;
 using FluxRoute.AI.Services;
 using FluxRoute.Core.Models;
 using FluxRoute.Core.Services;
+using FluxRoute.Core.Services.ChainBuilder;
 using FluxRoute.Services;
 using FluxRoute.Updater.Services;
 using FluxRoute.ViewModels;
@@ -174,6 +175,13 @@ public partial class App : Application
         services.AddSingleton(sp =>
             new NetworkChangeWatcher(sp.GetRequiredService<NetworkFingerprintProvider>()));
 
+        services.AddSingleton(sp =>
+        {
+            var settings = sp.GetRequiredService<ISettingsService>();
+            var dir = Path.GetDirectoryName(settings.SettingsPath)!;
+            return new ChainStore(Path.Combine(dir, "chains"));
+        });
+
         services.AddSingleton<MainViewModel>(sp => new MainViewModel(
             sp.GetRequiredService<ISettingsService>(),
             sp.GetRequiredService<IUpdaterService>(),
@@ -188,7 +196,8 @@ public partial class App : Application
             sp.GetRequiredService<AiHistoryStore>(),
             sp.GetRequiredService<BanditSelector>(),
             sp.GetRequiredService<StrategyEvolver>(),
-            sp.GetRequiredService<BatMaterializer>()));
+            sp.GetRequiredService<BatMaterializer>(),
+            sp.GetRequiredService<ChainStore>()));
         services.AddSingleton<TrayIconService>();
         services.AddSingleton<MainWindow>();
     }

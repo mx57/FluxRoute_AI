@@ -11,6 +11,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using FluxRoute.AI.Services;
 using FluxRoute.Core.Services;
+using FluxRoute.Core.Services.ChainBuilder;
 using FluxRoute.Services;
 using FluxRoute.Updater.Services;
 using FluxRoute.ViewModels;
@@ -78,6 +79,7 @@ public partial class MainWindow : Window
         var history = new AiHistoryStore(Path.Combine(dir, "fluxroute-ai-history.jsonl"));
         var materializer = new BatMaterializer(() => dir);
         var fingerprints = new NetworkFingerprintProvider();
+        var chainStore = new ChainStore(Path.Combine(dir, "chains"));
         return new MainViewModel(
             settings,
             new UpdaterService(),
@@ -94,7 +96,8 @@ public partial class MainWindow : Window
             new StrategyEvolver(registry, history,
                 () => Path.Combine(AppContext.BaseDirectory, "engine"),
                 () => settings.Load().Ai),
-            materializer);
+            materializer,
+            chainStore);
     }
 
     public MainWindow(MainViewModel viewModel, TrayIconService trayIcon, ILogger<MainWindow>? logger = null)
@@ -110,6 +113,13 @@ public partial class MainWindow : Window
         _logger = logger;
 
         DataContext = _vm;
+
+        // ChainBuilder canvas initialization
+        ChainCanvas.NodeSelected += node =>
+        {
+            _vm.ChainBuilder.SelectedNode = node;
+        };
+        _vm.ChainBuilder.SetCanvas(ChainCanvas);
 
         // Tray icon
         _trayIcon.SetVisible(true);
@@ -419,6 +429,17 @@ public partial class MainWindow : Window
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         Close();
+    }
+
+    private void ChainListItem_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.DataContext is Core.Models.ChainBuilder.ChainDefinition chain)
+            _vm.ChainBuilder.LoadChain(chain);
+    }
+
+    private void ResetChainView_Click(object sender, RoutedEventArgs e)
+    {
+        ChainCanvas.ResetView();
     }
 
     private static void ForceKillProcesses()
