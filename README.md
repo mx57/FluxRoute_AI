@@ -1,9 +1,9 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/FluxRoute-white.svg">
-  <source media="(prefers-color-scheme: light)" srcset="./assets/FluxRoute-dark.svg">
-  <img width="650" alt="BSDPI_AI Logo" src="./assets/FluxRoute-dark.svg" />
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/BSDPI_AI-white.svg">
+  <source media="(prefers-color-scheme: light)" srcset="./assets/BSDPI_AI-dark.svg">
+  <img width="650" alt="BSDPI_AI Logo" src="./assets/BSDPI_AI-dark.svg" />
 </picture>
 
 # BSDPI_AI
