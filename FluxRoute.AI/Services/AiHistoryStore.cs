@@ -25,14 +25,10 @@ public sealed class AiHistoryStore
                 Directory.CreateDirectory(dir);
             File.AppendAllText(_path, line);
 
-            if (_cache != null)
-            {
-                _cache.Add(outcome);
-            }
-            else
-            {
-                _cache = new List<ProbeOutcome> { outcome };
-            }
+            // BOLT ⚡: If _cache is null, we do NOT initialize it here with a single item.
+            // Doing so would cause LoadAll to return only that item and ignore previous history.
+            // We leave it null so LoadAll can perform a full file read later.
+            _cache?.Add(outcome);
         }
     }
 

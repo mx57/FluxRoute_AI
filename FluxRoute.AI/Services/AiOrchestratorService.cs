@@ -38,6 +38,8 @@ public sealed class AiOrchestratorService : IDisposable
     private readonly AiHistoryStore _history;
     private readonly BanditSelector _bandit;
     private readonly StrategyEvolver _evolver;
+    private readonly SemaphoreSlim _loopSignal = new(0, 1);
+    private readonly SemaphoreSlim _cycleLock = new(1, 1);
 
     private CancellationTokenSource? _cts;
     private int _consecutiveFailures;
@@ -48,6 +50,11 @@ public sealed class AiOrchestratorService : IDisposable
     private StrategyGenome? _currentGenome;
     private readonly ConcurrentDictionary<string, (int score, DateTimeOffset at)> _networkProbeCache = new();
     private bool _fastStartDone;
+
+    private List<TargetEntry> _cachedTargets = [];
+    private DateTime _lastTargetsFileTime = DateTime.MinValue;
+    private HashSet<string> _lastEnabledSites = [];
+    private List<TargetEntry> _lastUserSiteTargets = [];
 
     public event EventHandler<OrchestratorEventArgs>? StatusChanged;
 
@@ -158,8 +165,11 @@ public sealed class AiOrchestratorService : IDisposable
         }
     }
 
-    private void OnNetworkChanged(object? sender, (NetworkFingerprint OldFp, NetworkFingerprint NewFp) e) =>
+    private void OnNetworkChanged(object? sender, (NetworkFingerprint OldFp, NetworkFingerprint NewFp) e)
+    {
         _networkDirty = true;
+        SignalLoop();
+    }
 
     private async Task LoopAsync(CancellationToken ct)
     {
@@ -191,9 +201,13 @@ public sealed class AiOrchestratorService : IDisposable
 
                 try
                 {
-                    await Task.Delay(interval, ct).ConfigureAwait(false);
+                    await _loopSignal.WaitAsync(interval, ct).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
+                {
+                    break;
+                }
+                catch (ObjectDisposedException)
                 {
                     break;
                 }
@@ -240,6 +254,21 @@ public sealed class AiOrchestratorService : IDisposable
     }
 
     private async Task RunCycleAsync(CancellationToken ct)
+    {
+        if (!await _cycleLock.WaitAsync(0, ct).ConfigureAwait(false))
+            return;
+
+        try
+        {
+            await RunCycleInternalAsync(ct).ConfigureAwait(false);
+        }
+        finally
+        {
+            _cycleLock.Release();
+        }
+    }
+
+    private async Task RunCycleInternalAsync(CancellationToken ct)
     {
         var ai = _aiSettings();
         _history.RotateOldEntries(ai.KeepHistoryDays);
@@ -775,7 +804,11 @@ public sealed class AiOrchestratorService : IDisposable
 
             var name = Path.GetFileNameWithoutExtension(bat);
             var genome = GenomeParser.FromLaunchPlan(plan, name, StrategyOrigin.Builtin);
-            genome.Id = StableGuid.FromString("builtin:" + Path.GetFullPath(bat));
+
+            // Use relative path for ID stability if the app is moved
+            var relPath = Path.GetRelativePath(engineDir, bat).Replace('\\', '/');
+            genome.Id = StableGuid.FromString("builtin:" + relPath);
+
             genome.SourceBatPath = bat;
             genome.BatFileName = fn;
             genome.DisplayName = name;
@@ -829,7 +862,17 @@ public sealed class AiOrchestratorService : IDisposable
 
     private List<TargetEntry> BuildTargets()
     {
-        var targets = TargetEntry.ParseFile(_getTargetsPath());
+        var path = _getTargetsPath();
+        var fileInfo = new FileInfo(path);
+        var lastWrite = fileInfo.Exists ? fileInfo.LastWriteTime : DateTime.MinValue;
+
+        bool sitesChanged = !EnabledSites.SetEquals(_lastEnabledSites);
+        bool userTargetsChanged = !UserSiteTargets.SequenceEqual(_lastUserSiteTargets);
+
+        if (_cachedTargets.Count > 0 && lastWrite == _lastTargetsFileTime && !sitesChanged && !userTargetsChanged)
+            return _cachedTargets;
+
+        var targets = TargetEntry.ParseFile(path);
 
         foreach (var site in EnabledSites)
         {
@@ -839,11 +882,28 @@ public sealed class AiOrchestratorService : IDisposable
 
         targets.AddRange(UserSiteTargets);
 
-        return targets
+        var final = targets
             .Where(x => !string.IsNullOrWhiteSpace(x.Value))
             .GroupBy(x => $"{x.Kind}|{x.Key}|{x.Value}", StringComparer.OrdinalIgnoreCase)
             .Select(x => x.First())
             .ToList();
+
+        _cachedTargets = final;
+        _lastTargetsFileTime = lastWrite;
+        _lastEnabledSites = [.. EnabledSites];
+        _lastUserSiteTargets = [.. UserSiteTargets];
+
+        return final;
+    }
+
+    private void SignalLoop()
+    {
+        try
+        {
+            if (_loopSignal.CurrentCount == 0)
+                _loopSignal.Release();
+        }
+        catch (ObjectDisposedException) { }
     }
 
     private void Notify(string msg, bool switched = false, string? newProfile = null,
@@ -858,5 +918,10 @@ public sealed class AiOrchestratorService : IDisposable
         });
     }
 
-    public void Dispose() => Stop();
+    public void Dispose()
+    {
+        Stop();
+        _loopSignal.Dispose();
+        _cycleLock.Dispose();
+    }
 }

@@ -34,10 +34,7 @@ public sealed class BanditSelector
 
         if (_rng.NextDouble() * 1000 < explorationPermil)
         {
-            usable.Sort((a, b) =>
-                _registry.SumPullsForGenomeOnNetwork(a.Id, networkHash)
-                    .CompareTo(_registry.SumPullsForGenomeOnNetwork(b.Id, networkHash)));
-            return usable[0];
+            return usable.MinBy(g => _registry.SumPullsForGenomeOnNetwork(g.Id, networkHash));
         }
 
         var effective = _aiSettings().ParetoEnabled

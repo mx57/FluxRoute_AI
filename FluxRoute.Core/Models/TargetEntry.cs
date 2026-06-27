@@ -4,11 +4,22 @@ namespace FluxRoute.Core.Models;
 
 public enum TargetKind { Http, Ping }
 
-public sealed class TargetEntry
+public sealed class TargetEntry : IEquatable<TargetEntry>
 {
     public string Key { get; init; } = "";
     public TargetKind Kind { get; init; }
     public string Value { get; init; } = "";
+
+    public bool Equals(TargetEntry? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return Key == other.Key && Kind == other.Kind && Value == other.Value;
+    }
+
+    public override bool Equals(object? obj) => Equals(obj as TargetEntry);
+
+    public override int GetHashCode() => HashCode.Combine(Key, Kind, Value);
 
     public static List<TargetEntry> ParseFile(string path)
     {
